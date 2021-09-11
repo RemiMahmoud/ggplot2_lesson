@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data visualization on R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Rémi Mahmoud" />
+    <script src="ggplot2_slides_files/header-attrs/header-attrs.js"></script>
+    <link href="ggplot2_slides_files/remark-css/default.css" rel="stylesheet" />
+    <link href="ggplot2_slides_files/remark-css/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data visualization on R
+### Rémi Mahmoud
+
+---
+
+&lt;style&gt;
+
+.bottom {
+  margin: 0;
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}
+
+.large { font-size: 130% }
+
+.small {font-size: 80% }
+
+remark.macros.scale = function (percentage) {
+  var url = this;
+  return '&lt;img src="' + url + '" style="width: ' + percentage + '" /&gt;';
+};
+
+&lt;/style&gt;
+
+
+
+
+
+&lt;style type="text/css"&gt;
+pre {
+  max-width: 100%;
+  overflow-x: scroll;
+}
+&lt;/style&gt;
+
+
+
+# Who is talking ? 
+
+&lt;!-- .pull-left[![](lesson_figures/mahmoud_photo.jpeg)] --&gt;
+.center[&lt;img src="lesson_figures/mahmoud_photo.jpeg" style="width: 40%" /&gt;
+]
+
+&lt;!-- -- --&gt;
+&lt;!-- .pull-right[![](lesson_figures/camembert.jpg)] --&gt;
+
+
+.center[![](lesson_figures/inrae.png)]
+
+---
+class: center, middle
+
+# What you have to do:
+
+.large[Open Rstudio]
+
+&lt;!-- -- --&gt;
+
+&lt;!-- .large[Open the website: ] --&gt;
+
+--
+
+.large[Stop me if anything is unclear]
+
+
+
+---
+
+# What we will talk about today
+
+--
+
+* Visualize data in R
+
+--
+
+* Customize your plots
+
+--
+
+* Avoid caveats in data visualization
+
+
+--
+
+# What we will NOT talk about today
+
+--
+
+* Manipulate data etc. (next week :-) )
+
+
+---
+
+
+class: inverse, middle, center
+
+## Data-visualisation: WHY ?
+
+
+
+
+---
+
+### What have these sets of points in common ?
+
+.center[![](lesson_figures/anscombe_quartet.png)]
+
+
+
+---
+
+.center[![](lesson_figures/anscombe_quartet_answer.png)]
+
+
+
+---
+
+
+class: inverse, middle, center
+
+## DATA-VISUALIZATION IS AN ESSENTIAL STEP
+
+--
+
+## OUR BRAINS ARE NOT MADE TO SEE PATTERNS IN TABLES
+
+
+---
+
+
+
+## Framework
+
+All manipulations will be done in the `tidyverse` framework.
+
+
+--
+
+Hence, you should, if not already done, run the following command in R __NOW__
+
+
+```r
+install.packages("tidyverse")
+```
+
+
+---
+
+# Tidyverse = Tidy universe
+
+Tidyverse is a set of packages with differents purposes, that share the same syntax and that are designed to work in a complementary way  
+
+--
+
+.center[![](lesson_figures/tidyverse.png)]
+
+
+
+---
+
+.center[Today, we'll focus on the package ggplot2.]
+
+--
+.center[&lt;img src="lesson_figures/alleluiah_man.jpg" style="width: 40%" /&gt;]
+--
+
+.center[&lt;img src="lesson_figures/ggplot2.png" style="width: 30%" /&gt;]
+
+
+&lt;!-- You can list the packages available in the `tidyverse` by running the following command: --&gt;
+
+
+
+&lt;!-- -- --&gt;
+
+&lt;!-- You can see that `ggplot2` that you may already know belongs to the `tidyverse`. But there are *many other packages* !  --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- For instance, the `forcats` package allows to work in a convenient way with factors, `lubridate` with dates etc. . --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- For now, we will take a closer look to the `readr` and to a lesser extent `readxl` packages. These packages are useful to __import__ data. --&gt;
+
+
+
+---
+
+
+class: inverse, middle, center
+
+## ggplot2, WHY ?
+
+
+---
+
+.center[&lt;img src="lesson_figures/ggplot2_SO_trimed.jpg" style="width: 180%" /&gt;]
+
+&lt;!-- .center[![](lesson_figures/ggplot2_SO.jpg)] --&gt;
+
+---
+
+
+# Base R plots vs ggplot2: the clash
+
+__Base graphics:__
+
+  * directly available from R
+  * easy to use for beginners
+  * is less verbose for simple / canned graphics
+  * has methods (plot works for many different ojects)
+
+--
+
+__ggplot2:__
+
+  * R graphing package by Hadley Wickham based on the Grammar of Graphics (Wilkinson, 2005)
+  * is less verbose for complex / custom graphics: plots can be iteratively built up and edited later
+  * carefully chosen defaults = publication-quality graphics in seconds
+
+
+---
+
+# Harder ? Not really
+
+.center[![](lesson_figures/learning_curve_ggplot2.png)]
+
+---
+
+class: inverse, middle, center
+
+## GGPLOT2: BASICS
+
+---
+&lt;h3&gt;ggplot2 building blocks&lt;/h3&gt;
+&lt;div class="slideContent"&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Data&lt;/strong&gt;: a &lt;code&gt;data.frame&lt;/code&gt; and nothing else!&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Aesthetic mapping&lt;/strong&gt;: describe how data are mapped to things we can see on the plot through the function &lt;code&gt;aes()&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Geometric object&lt;/strong&gt;: perform the actual rendering of the plot and control the type of plot to create (&lt;code&gt;points&lt;/code&gt;, &lt;code&gt;line&lt;/code&gt;, &lt;code&gt;histogram&lt;/code&gt;, &lt;code&gt;boxplot&lt;/code&gt;…).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Statistical transformations&lt;/strong&gt;: transform the data for instance by summarising it in some manner (&lt;code&gt;sum&lt;/code&gt;, &lt;code&gt;density&lt;/code&gt;, &lt;code&gt;smooth&lt;/code&gt;…)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Position adjustments&lt;/strong&gt;: apply minor changes to the position of elements (&lt;code&gt;jitter&lt;/code&gt;, &lt;code&gt;fill&lt;/code&gt;, &lt;code&gt;stack&lt;/code&gt;, &lt;code&gt;dodge&lt;/code&gt;, &lt;code&gt;identity&lt;/code&gt;)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- - Scales --&gt;
+
+&lt;!-- - Coordinate system --&gt;
+
+&lt;!-- - Faceting --&gt;
+
+&lt;!-- voir livre page 37 pour une reformulation ?vnentuelle --&gt;
+
+&lt;/div&gt;
+
+&lt;/section&gt;
+
+---
+
+## In a nutshell
+
+
+.center[![](lesson_figures/building_blocks_ggplot.png)]
+
+
+
+---
+
+# Syntax
+
+
+
+```r
+library(ggplot2)
+ggplot(data = &lt;DATA&gt;,
+       aes(x = &lt;X AXIS VARIABLE&gt;,
+           y = &lt;Y AXIS VARIABLE&gt;, ... ), ...) +
+
+  geom_&lt;TYPE&gt;(aes(size = &lt;SIZE VARIABLE&gt;, ...),
+                   data = &lt;DATA&gt;,
+                   stat = &lt;FUNCTION&gt;,
+                   position = &lt;POSITION&gt;,
+                   color = &lt;"COLOR"&gt;, ...) +
+
+  scale_&lt;AESTHETIC&gt;_&lt;TYPE&gt;(name = &lt;NAME&gt;,
+                   breaks = &lt;WHERE&gt;,
+                   labels = &lt;LABELS&gt;, ... ) +
+
+  theme(...) +
+  facet_&lt;TYPE&gt;(&lt;FORMULA&gt;)
+```
+
+
+---
+
+
+### What happens when we create a simple ggplot() object ?
+
+
+```r
+library(ggplot2)
+ggplot()
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+### Almost nothing
+
+
+---
+
+
+### Specify data
+
+
+
+```r
+data("mpg")
+head(mpg)
+```
+
+```
+## # A tibble: 6 x 11
+##   manufacturer model displ  year   cyl trans      drv     cty   hwy fl    class 
+##   &lt;chr&gt;        &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;      &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; 
+## 1 audi         a4      1.8  1999     4 auto(l5)   f        18    29 p     compa~
+## 2 audi         a4      1.8  1999     4 manual(m5) f        21    29 p     compa~
+## 3 audi         a4      2    2008     4 manual(m6) f        20    31 p     compa~
+## 4 audi         a4      2    2008     4 auto(av)   f        21    30 p     compa~
+## 5 audi         a4      2.8  1999     6 auto(l5)   f        16    26 p     compa~
+## 6 audi         a4      2.8  1999     6 manual(m5) f        18    26 p     compa~
+```
+
+---
+
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))
+p
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+### Almost nothing ? Look at the axes :-)
+
+
+---
+
+### Let's specify what sort of plot we want, using a `geom_*` functions
+
+
+
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))
+p + geom_point()
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Another `geom_*`
+
+
+
+
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))
+p + geom_smooth()
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+### Combine two `geom` ?
+
+Simply __add__ as many geom_functions as you want
+
+
+
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))
+p + 
+  geom_smooth() + 
+  geom_point()
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Combine three `geom` ?
+
+* Suppose we want to also look a linear thrend
+
+* Need for help
+
+
+```r
+?geom_smooth
+```
+---
+
+.center[&lt;img src="lesson_figures/help_geom_smooth.jpg" style="width: 80%" /&gt;]
+
+
+---
+
+
+
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))
+p + 
+  geom_smooth() + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+### There are *many* `geom_*` functions:
+
+
+```r
+ls("package:ggplot2")[grepl(ls("package:ggplot2"),pattern =  "geom")]
+```
+
+```
+##  [1] "geom_abline"            "geom_area"              "geom_bar"              
+##  [4] "geom_bin2d"             "geom_blank"             "geom_boxplot"          
+##  [7] "geom_col"               "geom_contour"           "geom_contour_filled"   
+## [10] "geom_count"             "geom_crossbar"          "geom_curve"            
+## [13] "geom_density"           "geom_density_2d"        "geom_density_2d_filled"
+## [16] "geom_density2d"         "geom_density2d_filled"  "geom_dotplot"          
+## [19] "geom_errorbar"          "geom_errorbarh"         "geom_freqpoly"         
+## [22] "geom_function"          "geom_hex"               "geom_histogram"        
+## [25] "geom_hline"             "geom_jitter"            "geom_label"            
+## [28] "geom_line"              "geom_linerange"         "geom_map"              
+## [31] "geom_path"              "geom_point"             "geom_pointrange"       
+## [34] "geom_polygon"           "geom_qq"                "geom_qq_line"          
+## [37] "geom_quantile"          "geom_raster"            "geom_rect"             
+## [40] "geom_ribbon"            "geom_rug"               "geom_segment"          
+## [43] "geom_sf"                "geom_sf_label"          "geom_sf_text"          
+## [46] "geom_smooth"            "geom_spoke"             "geom_step"             
+## [49] "geom_text"              "geom_tile"              "geom_violin"           
+## [52] "geom_vline"             "guide_geom"             "update_geom_defaults"
+```
+
+---
+
+### Quick look around of some classical  `geom_*` functions: `geom_histogram`
+
+
+
+```r
+ggplot(data = mpg, aes(x = displ)) +
+  geom_histogram()
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+```r
+ggplot(data = mpg, aes(x = displ)) +
+  geom_histogram(bins =15)
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-14-2.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Quick look around of some classical  `geom_*` functions: `geom_density`
+
+
+
+
+```r
+ggplot(data = mpg, aes(x = displ)) +
+  geom_density(fill = "blue", alpha = .3) # alpha: transparency
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+### Quick look around of some classical  `geom_*` functions: `geom_boxplot`
+
+
+
+```r
+ggplot(data = mpg, aes(x = manufacturer, y = cty)) +
+  geom_boxplot()
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Quick look around of some classical  `geom_*` functions: `geom_bar`
+
+
+
+```r
+ggplot(data = mpg, aes(x = manufacturer)) +
+  geom_bar(alpha = .3, col = "purple", fill = "red") # col = borders ; fill = colour inside
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+### Take a look at this site to choose a plot
+[https://www.data-to-viz.com/](https://www.data-to-viz.com/)
+
+
+.center[&lt;img src="lesson_figures/data2viz.png" style="width: 80%" /&gt;]
+
+
+---
+
+class: center, middle
+
+# .large[Is everything clear ?]
+
+&lt;img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" /&gt;
+
+
+&lt;!-- --- --&gt;
+
+&lt;!-- class: center, middle --&gt;
+
+
+&lt;!-- &lt;img src="lesson_figures/break.jpg" style="width: 80%" /&gt; --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- .large[~ 15 minutes] --&gt;
+
+
+---
+  
+  
+class: center, middle
+
+---
+
+# Exercises
+
+
+.large[~ 20 minutes]
+
+--
+  
+.large[*Open "ggplot2_basics" with Rstudio*]
+
+
+
+
+---
+
+class: inverse, middle, center
+
+## GGPLOT2: Aesthetics / Facets / Labs
+
+
+---
+
+* One may want to :
+
+--
+
+* add color/transparency to the points
+
+--
+
+* or do one plot for each manufacturer (or modality of a given factor)
+
+--
+
+* specify a title/subtitle to the plot
+
+
+
+---
+
+### Aesthetics, basics
+
+&lt;section data-transition="linear" data-transition-speed="default" class="present" style="display: block;"&gt;
+&lt;h3&gt;Aesthetic mapping vs. parameter setting&lt;/h3&gt;
+&lt;div class="slideContent small-code"&gt;
+&lt;p&gt;Aesthetic mapping:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Data value determines visual characteristic&lt;/li&gt;
+&lt;li&gt;use &lt;code&gt;aes()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class="r"&gt;&lt;span class="identifier"&gt;ggplot&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="identifier"&gt;diamonds&lt;/span&gt;, &lt;span class="identifier"&gt;aes&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="identifier"&gt;x&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="identifier"&gt;carat&lt;/span&gt;, &lt;span class="identifier"&gt;y&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="identifier"&gt;price&lt;/span&gt;, &lt;span class="identifier"&gt;color&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="identifier"&gt;clarity&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt; &lt;span class="operator"&gt;+&lt;/span&gt; &lt;span class="identifier"&gt;geom_point&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Setting:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Constant value determines visual characteristic&lt;/li&gt;
+&lt;li&gt;Use parameter in &lt;code&gt;geom_&amp;lt;TYPE&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;/p&gt;&lt;center&gt;&lt;p&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="r"&gt;&lt;span class="identifier"&gt;ggplot&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="identifier"&gt;diamonds&lt;/span&gt;, &lt;span class="identifier"&gt;aes&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="identifier"&gt;x&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="identifier"&gt;carat&lt;/span&gt;, &lt;span class="identifier"&gt;y&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="identifier"&gt;price&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt; &lt;span class="operator"&gt;+&lt;/span&gt; &lt;span class="identifier"&gt;geom_point&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="identifier"&gt;color&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="string"&gt;"red"&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;/section&gt;
+
+
+---
+
+* Let's take another dataset
+
+
+```r
+data(diamonds)
+data_work  &lt;- diamonds[sample(1:nrow(diamonds), 5000),] # take 10000 random values of diamonds
+head(data_work)
+```
+
+```
+## # A tibble: 6 x 10
+##   carat cut       color clarity depth table price     x     y     z
+##   &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  1.02 Very Good F     SI2      60.9    58  4284  6.43  6.55  3.95
+## 2  1.34 Premium   D     SI2      61.5    58  7305  7.04  7.07  4.34
+## 3  1.05 Ideal     F     SI2      60.9    56  4675  6.64  6.56  4.02
+## 4  2.44 Very Good J     SI1      62.9    53 17472  8.58  8.62  5.41
+## 5  0.59 Ideal     D     SI2      62.3    55  1572  5.41  5.38  3.36
+## 6  0.35 Good      E     SI2      64      55   588  4.49  4.45  2.86
+```
+
+```r
+# See ?diamonds for the description of the dataset
+```
+
+---
+
+
+```r
+str(data_work)
+```
+
+```
+## tibble [5,000 x 10] (S3: tbl_df/tbl/data.frame)
+##  $ carat  : num [1:5000] 1.02 1.34 1.05 2.44 0.59 0.35 1.05 1.07 0.74 0.83 ...
+##  $ cut    : Ord.factor w/ 5 levels "Fair"&lt;"Good"&lt;..: 3 4 5 3 5 2 2 5 4 2 ...
+##  $ color  : Ord.factor w/ 7 levels "D"&lt;"E"&lt;"F"&lt;"G"&lt;..: 3 1 3 7 1 2 3 7 2 5 ...
+##  $ clarity: Ord.factor w/ 8 levels "I1"&lt;"SI2"&lt;"SI1"&lt;..: 2 2 2 3 2 2 2 3 2 2 ...
+##  $ depth  : num [1:5000] 60.9 61.5 60.9 62.9 62.3 64 63.6 60.8 62.2 63.9 ...
+##  $ table  : num [1:5000] 58 58 56 53 55 55 59 56 57 56 ...
+##  $ price  : int [1:5000] 4284 7305 4675 17472 1572 588 3989 3775 2002 2337 ...
+##  $ x      : num [1:5000] 6.43 7.04 6.64 8.58 5.41 4.49 6.4 6.61 5.79 5.99 ...
+##  $ y      : num [1:5000] 6.55 7.07 6.56 8.62 5.38 4.45 6.36 6.57 5.77 5.93 ...
+##  $ z      : num [1:5000] 3.95 4.34 4.02 5.41 3.36 2.86 4.06 4.01 3.59 3.81 ...
+```
+
+---
+
+
+* Price vs carat ?
+
+
+--
+
+
+```r
+p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
+  geom_point()
+p_diamonds
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+* We want the points to be green
+
+--
+
+* This does not depend on the data `\(\rightarrow\)` We specify the color argument *outside* `aes`
+
+--
+
+
+```r
+p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
+  geom_point(col = "green")
+p_diamonds
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+* We want the points to have on color for each quality of the cut
+
+--
+
+* This *depends*  on the data `\(\rightarrow\)` We specify the color argument *inside* `aes`
+
+--
+
+
+```r
+p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
+  geom_point(aes(`col = cut`)) `#Says to ggplot2, give on color to each modality of cut`
+p_diamonds
+```
+
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+* If the variable mapped to color is continuous, then the scale of the colour becomes automatically continuous
+
+--
+
+
+```r
+p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
+  geom_point(aes(col = depth)) #Says to ggplot2, give on color based on the value of depth
+p_diamonds
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Facet: draw multiple plots easily
+
+
+* Distribution of prices for the whole dataset:
+
+
+--
+
+
+```r
+histogram_prices &lt;- ggplot(data_work, aes(x = price)) + # No need for a y as we only need an histogram
+  geom_histogram()
+histogram_prices
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+* What if we want the distributions of prices *for each* modality of the *cut* variable
+
+
+---
+
+We simply need to use the `facet_wrap` function:
+
+
+```r
+histogram_prices + 
+  facet_wrap(cut~. )
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+We can use the `scales` argument, to let scales vary freely across plots
+
+
+```r
+histogram_prices + 
+  facet_wrap(cut~., scales = "free_y" )
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+* We can also make a grid of plots, using `facet_grid` function
+
+
+
+```r
+histogram_prices + 
+  facet_grid(cut~color,scales = "free_y")
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+
+## Titles and subtitles: say what you show, and show what you say
+
+
+* Many ways exist to specify titles in ggplot
+
+--
+
+* The easiest one may be to use the `labs` function
+
+--
+
+
+* Let's take another dataset
+
+
+```r
+data(economics)
+head(economics)
+```
+
+```
+## # A tibble: 6 x 6
+##   date         pce    pop psavert uempmed unemploy
+##   &lt;date&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+## 1 1967-07-01  507. 198712    12.6     4.5     2944
+## 2 1967-08-01  510. 198911    12.6     4.7     2945
+## 3 1967-09-01  516. 199113    11.9     4.6     2958
+## 4 1967-10-01  512. 199311    12.9     4.9     3143
+## 5 1967-11-01  517. 199498    12.8     4.7     3066
+## 6 1967-12-01  525. 199657    11.8     4.8     3018
+```
+
+```r
+str(economics)
+```
+
+```
+## spec_tbl_df [574 x 6] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+##  $ date    : Date[1:574], format: "1967-07-01" "1967-08-01" ...
+##  $ pce     : num [1:574] 507 510 516 512 517 ...
+##  $ pop     : num [1:574] 198712 198911 199113 199311 199498 ...
+##  $ psavert : num [1:574] 12.6 12.6 11.9 12.9 12.8 11.8 11.7 12.3 11.7 12.3 ...
+##  $ uempmed : num [1:574] 4.5 4.7 4.6 4.9 4.7 4.8 5.1 4.5 4.1 4.6 ...
+##  $ unemploy: num [1:574] 2944 2945 2958 3143 3066 ...
+```
+
+```r
+# See ?economics for the description of the dataset
+```
+
+---
+
+
+```r
+plot_unemployed &lt;- ggplot(data = economics, aes(x  =date, y = unemploy)) + 
+  geom_line() + 
+  geom_smooth(se = FALSE) + 
+  geom_smooth(span = 0.05, col = "green", se = FALSE ) 
+
+plot_unemployed
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-30-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+* Adding a title is straightforward
+
+--
+
+```r
+plot_unemployed + 
+  labs(title = "Number of unemployed people (in thousands) in the USA")
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+* Adding subtitle/caption is also straightforward
+
+--
+
+
+```r
+plot_unemployed + 
+  labs(title = "Number of unemployed people (in thousands) in the USA", subtitle = "From 1967 to 2015", caption = "Copyright Remi Mahmoud :-)")
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+* Adding modifying axes titles is also straightforward
+
+--
+
+
+```r
+plot_unemployed + 
+  labs(title = "Number of unemployed people (in thousands) in the USA", subtitle = "From 1967 to 2015", caption = "Copyright Remi Mahmoud :-)", x = "DATE", y = "Number of unemployed people")
+```
+
+&lt;img src="ggplot2_slides_files/figure-html/unnamed-chunk-33-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+
+# Exercises
+
+
+.large[~ 20 minutes]
+
+--
+  
+.large[*Open "ggplot2_basics" with Rstudio*]
+
+
+---
+
+
+
+
+
+class: inverse, middle, center
+
+## GGPLOT2: Customizing your plot
+
+.center[&lt;img src="lesson_figures/meme_full.jpg" style="width: 80%" /&gt;]
+
+
+---
+
+
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

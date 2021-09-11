@@ -1,0 +1,1067 @@
+---
+title: "Data-wrangling on R"
+author: "Rémi Mahmoud"
+output:
+  xaringan::moon_reader:
+    nature:
+      highlightLines: true
+      highlightSpans: true
+      countIncrementalSlides: false
+editor_options: 
+  chunk_output_type: console
+---
+<style>
+
+.bottom {
+  margin: 0;
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}
+
+.large { font-size: 130% }
+
+.small {font-size: 80% }
+
+remark.macros.scale = function (percentage) {
+  var url = this;
+  return '<img src="' + url + '" style="width: ' + percentage + '" />';
+};
+
+</style>
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(cache = TRUE, fig.align = "center", dev = "svg")
+options(tibble.print_max = 6, tibble.print_min = 6)
+knitr::opts_knit$set(root.dir = normalizePath('../'))
+
+
+hook_source <- knitr::knit_hooks$get('source')
+knitr::knit_hooks$set(source = function(x, options) {
+  x <- stringr::str_replace(x, "^[[:blank:]]?([^*].+?)[[:blank:]]*#<<[[:blank:]]*$", "*\\1")
+  hook_source(x, options)
+}) #To highlight code more easily (see https://www.garrickadenbuie.com/blog/highlight-lines-without-breaking-the-code-in-xaringan/)
+
+
+```
+
+```{r, echo = FALSE, warning=FALSE, message = FALSE}
+library(tidyr)
+library(dplyr)
+library(tibble)
+
+```
+
+```{css, echo=FALSE}
+pre {
+  max-width: 100%;
+  overflow-x: scroll;
+}
+```
+
+
+
+# Who is talking ? 
+
+<!-- .pull-left[![](lesson_figures/mahmoud_photo.jpeg)] -->
+.center[<img src="lesson_figures/mahmoud_photo.jpeg" style="width: 40%" />
+]
+
+<!-- -- -->
+<!-- .pull-right[![](lesson_figures/camembert.jpg)] -->
+
+
+.center[![](lesson_figures/inrae.png)]
+
+---
+class: center, middle
+
+# What you have to do:
+
+.large[Open Rstudio]
+
+--
+
+.large[Open the website: https://datawrangling-tuto.netlify.app/lesson/#1]
+
+
+--
+
+.large[Stop me if anything is unclear]
+
+
+
+---
+
+# What is data-wrangling ?
+
+--
+
+![](lesson_figures/data-science-wrangle.png)
+--
+
+* data-wrangling is the set of operations on __raw__ data that leads to __non messy__ (tidy) data.
+
+
+
+
+---
+
+# What we will talk about today
+
+--
+
+* Data importation
+
+--
+
+* Manipulate data (filtering, arranging data etc.)
+
+--
+
+* Tidy data
+
+
+--
+
+# What we will NOT talk about today
+
+--
+
+* Dealing with missing values / outliers
+
+
+---
+
+## Framework
+
+All manipulations will be done in the `tidyverse` framework.
+
+
+--
+
+Hence, you should, if not already done, run the following command in R __NOW__
+
+```{r, echo = TRUE, eval=FALSE}
+
+install.packages("tidyverse")
+```
+
+
+---
+
+# Tidyverse = Tidy universe
+
+Tidyverse is a set of packages with differents purposes, that share the same syntax and that are designed to work in a complementary way  
+
+--
+
+.center[![](lesson_figures/tidyverse.png)]
+
+
+
+---
+
+You can list the packages available in the `tidyverse` by running the following command:
+
+```{r, echo = TRUE, eval = TRUE}
+tidyverse::tidyverse_packages()
+
+```
+
+--
+
+You can see that `ggplot2` that you may already know belongs to the `tidyverse`. But there are *many other packages* ! 
+
+--
+
+For instance, the `forcats` package allows to work in a convenient way with factors, `lubridate` with dates etc. .
+
+--
+
+For now, we will take a closer look to the `readr` and to a lesser extent `readxl` packages. These packages are useful to __import__ data.
+
+
+
+---
+
+# Import data with `readr`
+
+The `read_csv` function of `readr` allows to read csv files.
+
+--
+```{r}
+
+data_work <- readr::read_csv('data/iris.csv')
+
+```
+
+`read_csv` is faster than base R `read.csv` and it parses well different types of columns.
+
+
+
+---
+
+This function has also other arguments that may be useful for you when using it:
+
+--
+
+* `skip` to specify the number of lines to skip before reading the file
+* `na` to specify what should be considered as `NA` (for ex: you could put `na = "Not answered"`)
+* `col_names` to specify the names of the columns you want to have in your dataset.
+* See `?read_csv` for other arguments.
+
+---
+
+# Tibble vs dataframe
+
+Let us take a look at the data we have imported.
+
+```{r}
+
+head(data_work)
+
+```
+
+--
+
+Note the particular output of the print:
+
+* *A tibble*
+* The  type of each column is written under each col_name
+
+---
+
+### The tibble is an alternative to the classical `data.frame` of base R
+
+--
+
+As part of the tidyverse, it is mainly used in the tidyverse' packages.
+
+--
+
+__The difference should not worry you__: the main difference with a classical dataframe is the nicer output when printing (run `iris` in R to see the difference). 
+
+--
+
+By the way, note that a tibble __is a data.frame__
+
+```{r}
+is.data.frame(data_work)
+```
+
+
+
+---
+
+## An other package of the `tidyverse` : `readxl` to read .xlsx files
+
+The function `read_xlsx` allows you to read .xlsx files.
+
+--
+
+Some arguments are useful for you:
+
+* `sheet` : name of the sheet of the file you want to read (if you provide a string), or position of the sheet you want to read (if you provide an integer)
+* same arguments as `read_csv` (`na`, `skip` etc.)
+* see `?read_xlsx` for details.
+
+---
+
+class: center, middle
+
+# .large[Is everything ok until now ?]
+
+<img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" />
+
+---
+class: center, middle
+
+# Exercises
+
+.large[~ 30 minutes]
+
+--
+
+.large[*File  --> New project --> Version Control -->  Git  --> Copy paste deposit URL*]
+
+OR 
+
+.large[*Download the zip Github depository, open "Import_data_exercises.Rmd" with Rstudio*]
+
+
+
+---
+
+## Manipulate your data using `dplyr`
+
+`dplyr` is a package of the `tidyverse` designed to manipulate your data easily.
+
+
+--
+
+> what do we mean by manipulating the data easily ?
+
+
+--
+
+Select columns, filter their rows, create new columns etc.
+
+--
+
+<!-- .center[![](lesson_figures/dplyr1.jpg)] -->
+.center[<img src="lesson_figures/dplyr1.jpg" style="width: 75%" />]
+
+---
+
+Let us consider the dataset `data_work` previously introduced (it is simply the well know `iris` dataset turned into tibble). 
+
+```{r, echo = FALSE}
+data_work
+```
+
+Let us see the manipulations we can do on this dataset.
+
+---
+
+## `dplyr::select`
+
+In a data analysis, we could be interested in:
+
+* *select* some columns, for instance:
+  + *select* the 3rd column
+
+--
+
+```{r, eval = FALSE}
+select(data_work, `3`)
+```
+
+```{r, echo = FALSE}
+select(data_work, 3)
+```
+
+
+---
+
+## `dplyr::select`
+
+In a data analysis, we could be interested in:
+
+* *select* some columns, for instance:
+  + *select* column Sepal.Width
+
+--
+
+```{r, eval = FALSE}
+select(data_work, `Sepal.Width`) 
+# Note the absence of " around Sepal .Width
+```
+
+```{r, echo = FALSE}
+select(data_work, Sepal.Width) 
+# Note the absence of " around Sepal .Width
+```
+
+---
+
+## `dplyr::select`
+
+In a data analysis, we could be interested in:
+
+* *select* some columns, for instance:
+  + *select*  all columns except Sepal.width and Sepal.Length)
+  
+--
+
+```{r, eval = FALSE}
+select(data_work, `- c(Sepal.Width, Sepal.Length)`)
+```
+
+```{r, echo = FALSE}
+select(data_work, - c(Sepal.Width, Sepal.Length))
+```
+
+--
+
+Note the absence of " around Sepal.Width and Sepal.Length,
+and the __-__ that means __except__
+
+---
+
+## `dplyr::select`: helpers()
+
+`select()` is provided with many *functions helpers* that you can use to select columns, for instance:
+
+* `select(data_work, contains("pal"))`: all columns of `data_work` with a name containing "pal"
+
+--
+
+* `select(data_work, starts_with("Se"))`: *can you guess it ?*
+
+--
+
+* `select(data_work, ends_with("th"))`: *can you guess it ?*
+
+--
+
+* `select(data_work, matches("*th"))`: *can you guess it ?* (select columns with a name matching a regular expression)
+
+--
+
+> .large[That's one of the assets of the dplyr syntax: it looks like almost natural language.]
+
+---
+  
+## `dplyr::filter`
+
+In a data analysis, we could be interested in:
+
+* *filter* rows based on the values of some columns (predicates), for instance:
+  + *filter* rows of `data_work` with individuals having their length of Sepal greater than 4
+
+--
+```{r, eval = FALSE}
+filter(data_work, `Sepal.Length > 4`)
+```
+
+```{r, echo = FALSE}
+filter(data_work, Sepal.Length > 4)
+```
+
+---
+
+
+## `dplyr::filter`
+
+In a data analysis, we could be interested in:
+
+* *filter* rows based on the values of some columns (predicates), for instance:
+  + *filter* rows of `data_work` of species "virginica"
+
+--
+
+
+```{r, eval = FALSE}
+filter(data_work, `Species == "virginica"`)
+```
+
+```{r, echo = FALSE}
+filter(data_work, Species == "virginica")
+```
+
+
+---
+
+## `dplyr::filter`
+  
+You can put multiple conditions, for instance:
+
+* *filter* rows based on the values of some columns (predicates), for instance:
+  + *filter* rows of `data_work` of species "virginica" and with their Width of Petal smaller than 2
+
+--
+
+```{r, eval = FALSE}
+filter(data_work, `Species == "virginica", Petal.Width < 2`)
+```
+
+```{r, echo = FALSE}
+filter(data_work, Species == "virginica", Petal.Width < 2)
+```
+
+---
+class: center, middle
+
+> .large[Again, it looks like the natural language !]
+
+--
+
+.large[*That's one of the nicer things in the `dplyr` syntax.*]
+
+---
+
+## `dplyr::mutate`
+
+--
+
+`mutate` is the verb used to create new columns.
+
+--
+
+For instance, suppose we want to compute the sum of the lengths of the Sepal and the Petal in our dataset.
+
+--
+
+```{r}
+mutate(data_work, sum_lengths = Sepal.Length + Petal.Length)
+```
+
+---
+
+## `dplyr`: other useful functions
+
+
+.small[`dplyr` provides many useful functions. You can guess their purposes just by their name:]
+
+--
+
+* `arrange`: `arrange(data_work, Species, desc(Petal.Length))`
+
+--
+
+```{r, echo = FALSE}
+arrange(data_work, Species, desc(Petal.Length))
+```
+
+---
+
+## `dplyr`: other useful functions
+
+
+.small[`dplyr` provides many useful functions. You can guess their purposes just by their name:]
+
+--
+
+* `distinct`: `distinct(data_work, Species)`
+
+--
+
+```{r, echo = FALSE}
+distinct(data_work, Species)
+```
+
+---
+
+## `dplyr`: other useful functions
+
+
+.small[`dplyr` provides many useful functions. You can guess their purposes just by their name:]
+
+--
+
+* `rename`: `rename(data_work, S.Width = Sepal.Width, S.Length = Sepal.Length)`
+
+--
+
+```{r, echo = FALSE}
+rename(data_work, S.Width = Sepal.Width, S.Length = Sepal.Length)
+```
+
+
+---
+
+class: center, middle
+
+# .large[Is everything clear ?]
+
+<img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" />
+
+
+---
+
+class: center, middle
+
+
+<img src="lesson_figures/break.jpg" style="width: 80%" />
+
+--
+
+.large[~ 10 minutes]
+
+
+---
+
+
+# Chain commands using %>% (pipe) operator
+
+The %>% (pronounce pipe) provides a convenient way to code, as it allows the code to be written in chain. 
+
+.center[![](lesson_figures/this_is_not_a_pipe.jpg)]
+
+--
+
+> __IMPORTANT__: the keyboard shortcut for %>% is *ctrl + shift + M*
+
+--
+
+> Try it !
+
+---
+
+For instance, suppose we want to:
+
+1. *filter* rows of `data_work` of species "virginica" and with their Width of Petal smaller than 2
+2. *then* compute the sum of the lengths of the Sepal and the Petal in our dataset.
+3. *then* select the columns with their name starting with an $S$
+4. *then* arrange the result by length of Sepal.Length
+
+We would write
+
+--
+
+```{r, eval = FALSE}
+arrange(select(mutate(filter(data_work, Species == 'virginica', Petal.Width <2), Sum_lengths = Sepal.Length + Petal.Length), starts_with("S")), Sepal.Length)
+```
+
+--
+
+> Isn't it unreadable ?!
+
+---
+
+Let's write it using the %>% operator:
+
+--
+
+```{r,  eval=FALSE}
+data_work %>% 
+  filter(Species == 'virginica', Petal.Width < 2) %>% 
+  mutate(Sum_lengths = Sepal.Length + Petal.Length) %>% 
+  select(starts_with("S")) %>% 
+  arrange(Sepal.Length)
+```
+
+
+--
+
+
+You see how clearer it looks ?
+
+--
+
+
+If I run this: `x %>% sum` it is strictly equivalent to `sum(x)`.
+
+
+--
+
+It means: take `x` and pass it through the function `sum`.
+---
+
+.small[Another example to see the power of %>%. Suppose I want to carry out the following steps:]
+
+--
+
+.small[1. Take `data_work`
+2. Select variables containing "Sepal", and "Petal.Width" and "Species"
+3. Filter rows with length of Sepal greater than 5
+4. Fit a linear model of Petal.Width vs Sepal.Width + Sepal.Length + Species
+5. Print a summary of the model]
+
+
+--
+
+```{r, eval = FALSE}
+
+data_work %>% `#Step 1`
+  select(contains("Sepal") ,
+         Petal.Width, Species) %>% `# Step 2`
+  filter(Sepal.Length >5) %>% `# Step 3`
+  lm(Petal.Width ~ Sepal.Width + Sepal.Length + Species,
+     data= .) %>% `# Step 4: NOTE THE .`
+  summary `# Step 5`
+
+```
+
+```{r, echo = FALSE}
+
+data_work %>% #Step 1
+  select(contains("Sepal") ,
+         Petal.Width, Species) %>% # Step 2
+  filter(Sepal.Length >5) %>% # Step 3
+  lm(Petal.Width ~ Sepal.Width + Sepal.Length + Species,
+     data= .) %>% # Step 4: NOTE THE .
+  summary # Step 5
+
+```
+
+---
+
+```{r, eval = FALSE}
+
+data_work %>% `#Step 1`
+  select(contains("Sepal") ,
+         Petal.Width, Species) %>% `# Step 2`
+  filter(Sepal.Length > 5) %>% `# Step 3`
+  lm(Petal.Width ~ Sepal.Width + Sepal.Length + Species,
+     data= `.`) %>% `# Step 4: NOTE THE .`
+  summary `# Step 5`
+
+```
+
+--
+
+In this example, it is also important to notice the .large[__.__] . When using the pipe, the "." is the object refering to what's before the last %>% .
+
+--
+
+It is important to specify it when the argument that needs the object before the last %>% is not the first argument.That's why we had to specify it in the `lm` function and not in the `select` function.
+
+---
+
+# Group operations
+
+.large[An important features of `dplyr` is its ability to *group* tibbles and compute operations on these *grouped* tibbles.]
+
+--
+
+.large[A *key* function of `dplyr` is `group_by`.]
+
+---
+
+## `dplyr::group_by`
+
+--
+
+```{r, eval = FALSE}
+data_work_by_species <- data_work %>%
+  `group_by`(Species) 
+# Equivalent to data_work_by_species <- group_by(data_work, Species)
+
+data_work_by_species
+```
+
+```{r, echo = FALSE}
+data_work_by_species <- data_work %>%
+  group_by(Species) 
+# Equivalent to data_work_by_species <- group_by(data_work, Species)
+
+data_work_by_species
+```
+--
+
+Note the `# Groups:   Species [3]`. It means that operations on this dataset will be done for each group.
+
+---
+
+For example, suppose we want to compute the median of the width of the Sepal for each species.
+
+```{r}
+data_work_by_species %>%
+  mutate(median_sepal_width = median(Sepal.Width)) %>% 
+  select(starts_with("S"), median_sepal_width)
+
+```
+
+It's nice, but we may also need to summarise the table, just keep a summary of the Species and the median.
+
+---
+
+`dplyr::summarise`
+
+It is easily done by the function `summarise`
+
+--
+
+```{r}
+data_work_by_species %>%
+  summarise(median_sepal_width = median(Sepal.Width)) 
+
+```
+
+
+---
+
+If you want to take out the grouped structure of your tibble, you just have to use the function `ungroup`
+
+```{r}
+data_work_by_species %>% ungroup
+```
+
+---
+## Functions to join tables
+
+.center[<img src="lesson_figures/figure_join_table.png" style="width: 60%" />
+<img src="lesson_figures/figure_join_exemples.png" style="width: 50%" />]
+
+
+.small[Image from [RStudio data transformation cheatsheet](https://www.rstudio.com/resources/cheatsheets/)]
+---
+
+# Since `dplyr` 1.0: function `dplyr::across`
+
+--
+
+To help apply a function over multiple columns, `dplyr` came with the function `across`
+
+--
+
+General syntax is: .small[`across(.cols = THE COLUMNS ON WHICH YOU WANT TO APPLY THE FUNCTION(S), .fns = THE FUNCTION YOU WANT TO APPLY, ...)`]
+
+--
+
+See `?dplyr::across` for more details and further arguments
+
+---
+
+Combined with the `where` function, it allows to apply a function on specific columns
+
+```{r, eval = FALSE}
+
+data_work %>% 
+  mutate(across(where(is.character), as.factor)) `# apply function as.factor where the columns have the type character`
+
+```
+
+```{r, echo = FALSE}
+
+data_work %>% 
+  mutate(across(where(is.character), as.factor)) 
+
+```
+
+
+---
+
+You can specify the name and a specific functions using the `~.x` syntax. `.names` is used to specify the names of the new columns. It has a specific syntax (see `?dplyr::across`).
+
+--
+
+```{r, eval = FALSE}
+
+data_work %>% 
+  mutate(across(where(is.numeric), ~ .x*0.01, .names = "{.col}_in_meters" )) `# apply personal function where the columns have the type numeric`
+
+```
+
+```{r, echo = FALSE}
+
+data_work %>% 
+  mutate(across(where(is.numeric), ~ .x*0.01, .names = "{.col}_in_meters" ))
+
+```
+
+
+---
+
+class: center, middle
+
+# .large[Do you have questions ?]
+
+<img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" />
+
+
+---
+class: center, middle
+
+# Exercises
+
+
+.large[~ 20 minutes]
+
+--
+
+.large[*Open "Manipulate_and_tidy_your_data_exercises.Rmd" with Rstudio*]
+
+--
+
+.large[*Answer to the questions until section "Tidy your data"*]
+
+
+
+---
+
+# Tidy data
+
+1. Each variable must have its own column
+2. Each observation must have its row
+3. Each value must have its own cell
+
+![](lesson_figures/tidy-1.png)
+
+---
+
+```{r, echo = FALSE, eval = TRUE}
+# library(tibble)
+d <-tribble(~ country, ~"2002", ~	"2007",
+            "Belgium",	10311970,	10392226,
+            "France",	59925035,	61083916,
+            "Germany",	82350671,	82400996,
+            "Italy",	57926999,	58147733,
+            "Spain",	40152517,	40448191,
+            "Switzerland",	7361757,	7554661)
+```
+
+--
+
+For instance, imagine this dataset, giving the population of different countries in 2002 and 2007:
+
+```{r, eval = TRUE}
+
+d %>% head
+
+```
+
+--
+
+* Is this dataset tidy ?
+
+--
+
+This is dataset is __not__ tidy, as the population, which is an observed variable is not in a distinct column (principle 1.). Year is also a variable, so it should have its column too.
+
+---
+
+Instead, we should have:
+
+
+```{r, echo = FALSE}
+d %>% pivot_longer(cols =  c("2002", "2007"), names_to = "year", values_to = "population") %>% head
+```
+
+
+---
+
+### Make tidy data
+
+Two key functions, of package `tidyr` are used to tidy the data:
+
+--
+
+* `tidyr::pivot_longer` is used to make your dataset *longer* (what a surprise ! :O)
+* `tidyr::pivot_wider` is used to make your dataset *wider* (what a surprise ! :O)
+
+
+
+---
+
+In practice:
+
+```{r}
+
+#d is the dataset with the populations of the countries
+data_tidy <- d %>% pivot_longer(cols =  c("2002","2007"))
+
+head(data_tidy)
+```
+
+--
+
+The first argument is the dataset to tidy (which is not necessary to complete because of the %>% ).
+
+--
+
+The second is the name of the columns to gather.
+
+
+---
+
+We can also provide another names to the new columns using the arguments `values_to` and `names_to`.
+
+--
+
+The columns to gather can also be selected using the select helpers that we've seen previously:
+
+--
+
+```{r, eval = FALSE}
+
+#d is the dataset with the populations of the countries
+data_tidy <- d %>%
+  pivot_longer(cols =  `-country`,
+               `names_to` = "Year", # New name
+               #for the columns 2002 and 2007
+               `values_to` = "Population") 
+    #New name for the values
+
+head(data_tidy)
+```
+
+```{r, echo = FALSE}
+
+#d is the dataset with the populations of the countries
+data_tidy <- d %>%
+  pivot_longer(cols =  -country,
+               names_to = "Year",
+               values_to = "Population")
+
+head(data_tidy)
+```
+
+---
+
+Conversely, `pivot_wider` allows us to come back to the first dataset.
+
+--
+
+```{r}
+
+data_tidy %>% pivot_wider(names_from = Year, values_from = Population)
+
+```
+
+
+---
+
+class: center, middle
+
+# .large[Is everything clear ?]
+
+<img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" />
+
+
+---
+class: center, middle
+
+# Exercises
+
+--
+.large[~ 20 minutes]
+
+--
+
+.large[*Answer to the questions of the section "Tidy your data"*]
+
+
+---
+
+# Conclusion
+
+The `tidyverse` provides many tools to work with data. 
+
+--
+
+Many topics have not been presented today:
+
+* manipulate factors using `forcats`
+* manipulate dates using `lubridate`
+* manipulate dates using `stringr`
+* ...
+
+--
+
+Feel free to consult this book (available for free online at this adress: [https://r4ds.had.co.nz/](https://r4ds.had.co.nz/)):
+
+<!-- .center[![](lesson_figures/r4ds.jpg)] -->
+.center[<img src="lesson_figures/r4ds.jpg" style="width: 20%" />]
+
+---
+
+class: center, middle
+
+# THANKS
+
+--
+
+.large[Any remark, questions ?]
+
+--
+
+.large[remi.mahmoud@inrae.fr]
+
+--
+
+Lesson contents available at: [https://github.com/RemiMahmoud/data_wrangling](https://github.com/RemiMahmoud/data_wrangling)
+
+<!-- ### `tidyr::pivot_longer` and `tidyr::pivot_wider` -->
+
