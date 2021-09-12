@@ -2,3 +2,4 @@ base
 tidyr
 dplyr
 tibble
+ggplot2

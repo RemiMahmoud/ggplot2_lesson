@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Data-wrangling on R</title>
+    <title>Data visualization on R</title>
     <meta charset="utf-8" />
     <meta name="author" content="Rémi Mahmoud" />
     <script src="index_files/header-attrs/header-attrs.js"></script>
@@ -12,7 +12,7 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Data-wrangling on R
+# Data visualization on R
 ### Rémi Mahmoud
 
 ---
@@ -42,6 +42,14 @@ remark.macros.scale = function (percentage) {
   var url = this;
   return '&lt;img src="' + url + '" style="width: ' + percentage + '" /&gt;';
 };
+
+
+.scrollable-slide {
+    height: 800px;
+    overflow-y: auto !important;
+    
+}
+
 
 &lt;/style&gt;
 
@@ -77,10 +85,9 @@ class: center, middle
 
 .large[Open Rstudio]
 
---
+&lt;!-- -- --&gt;
 
-.large[Open the website: https://datawrangling-tuto.netlify.app/lesson/#1]
-
+&lt;!-- .large[Open the website: ] --&gt;
 
 --
 
@@ -90,33 +97,19 @@ class: center, middle
 
 ---
 
-# What is data-wrangling ?
-
---
-
-![](lesson_figures/data-science-wrangle.png)
---
-
-* data-wrangling is the set of operations on __raw__ data that leads to __non messy__ (tidy) data.
-
-
-
-
----
-
 # What we will talk about today
 
 --
 
-* Data importation
+* Visualize data in R
 
 --
 
-* Manipulate data (filtering, arranging data etc.)
+* Customize your plots
 
 --
 
-* Tidy data
+* Avoid caveats in data visualization
 
 
 --
@@ -125,10 +118,48 @@ class: center, middle
 
 --
 
-* Dealing with missing values / outliers
+* Manipulate data etc. (next week :-) )
 
 
 ---
+
+
+class: inverse, middle, center
+
+## Data-visualisation: WHY ?
+
+
+
+
+---
+
+### What have these sets of points in common ?
+
+.center[![](lesson_figures/anscombe_quartet.png)]
+
+
+
+---
+
+.center[![](lesson_figures/anscombe_quartet_answer.png)]
+
+
+
+---
+
+
+class: inverse, middle, center
+
+## DATA-VISUALIZATION IS AN ESSENTIAL STEP
+
+--
+
+## OUR BRAINS ARE NOT MADE TO SEE PATTERNS IN TABLES
+
+
+---
+
+
 
 ## Framework
 
@@ -159,910 +190,822 @@ Tidyverse is a set of packages with differents purposes, that share the same syn
 
 ---
 
-You can list the packages available in the `tidyverse` by running the following command:
-
-
-```r
-tidyverse::tidyverse_packages()
-```
-
-```
-##  [1] "broom"      "cli"        "crayon"     "dbplyr"     "dplyr"     
-##  [6] "forcats"    "ggplot2"    "haven"      "hms"        "httr"      
-## [11] "jsonlite"   "lubridate"  "magrittr"   "modelr"     "pillar"    
-## [16] "purrr"      "readr"      "readxl"     "reprex"     "rlang"     
-## [21] "rstudioapi" "rvest"      "stringr"    "tibble"     "tidyr"     
-## [26] "xml2"       "tidyverse"
-```
+.center[Today, we'll focus on the package ggplot2.]
 
 --
 
-You can see that `ggplot2` that you may already know belongs to the `tidyverse`. But there are *many other packages* ! 
+.center[&lt;img src="lesson_figures/ggplot2.png" style="width: 30%" /&gt;]
 
 --
+.center[&lt;img src="lesson_figures/alleluiah_man.jpg" style="width: 40%" /&gt;]
 
-For instance, the `forcats` package allows to work in a convenient way with factors, `lubridate` with dates etc. .
+&lt;!-- You can list the packages available in the `tidyverse` by running the following command: --&gt;
 
---
 
-For now, we will take a closer look to the `readr` and to a lesser extent `readxl` packages. These packages are useful to __import__ data.
+
+&lt;!-- -- --&gt;
+
+&lt;!-- You can see that `ggplot2` that you may already know belongs to the `tidyverse`. But there are *many other packages* !  --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- For instance, the `forcats` package allows to work in a convenient way with factors, `lubridate` with dates etc. . --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- For now, we will take a closer look to the `readr` and to a lesser extent `readxl` packages. These packages are useful to __import__ data. --&gt;
 
 
 
 ---
 
-# Import data with `readr`
 
-The `read_csv` function of `readr` allows to read csv files.
+class: inverse, middle, center
+
+## ggplot2, WHY ?
+
+
+---
+
+.center[&lt;img src="lesson_figures/ggplot2_SO_trimed.jpg" style="width: 180%" /&gt;]
+
+&lt;!-- .center[![](lesson_figures/ggplot2_SO.jpg)] --&gt;
+
+---
+
+
+# Base R plots vs ggplot2: the clash
+
+__Base graphics:__
+
+  * directly available from R
+  * easy to use for beginners
+  * is less verbose for simple / canned graphics
+  * has methods (plot works for many different ojects)
 
 --
 
-```r
-data_work &lt;- readr::read_csv('data/iris.csv')
-```
 
-```
-## Parsed with column specification:
-## cols(
-##   Sepal.Length = col_double(),
-##   Sepal.Width = col_double(),
-##   Petal.Length = col_double(),
-##   Petal.Width = col_double(),
-##   Species = col_character()
-## )
-```
 
-`read_csv` is faster than base R `read.csv` and it parses well different types of columns.
+__ggplot2:__
+
+  * R graphing package by Hadley Wickham based on the Grammar of Graphics (Wilkinson, 2005)
+  * is less verbose for complex / custom graphics: plots can be iteratively built up and edited later
+  * carefully chosen defaults = publication-quality graphics in seconds
+
+
+---
+
+# Harder ? Not really
+
+.center[![](lesson_figures/learning_curve_ggplot2.png)]
+
+---
+
+class: inverse, middle, center
+
+## GGPLOT2: BASICS
+
+
+.center[&lt;img src="lesson_figures/meme_part_1.jpg" style="width: 60%" /&gt;]
+
+---
+&lt;h3&gt;ggplot2 building blocks&lt;/h3&gt;
+&lt;div class="slideContent"&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Data&lt;/strong&gt;: a &lt;code&gt;data.frame&lt;/code&gt; and nothing else!&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Aesthetic mapping&lt;/strong&gt;: describe how data are mapped to things we can see on the plot through the function &lt;code&gt;aes()&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Geometric object&lt;/strong&gt;: perform the actual rendering of the plot and control the type of plot to create (&lt;code&gt;points&lt;/code&gt;, &lt;code&gt;line&lt;/code&gt;, &lt;code&gt;histogram&lt;/code&gt;, &lt;code&gt;boxplot&lt;/code&gt;…).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Statistical transformations&lt;/strong&gt;: transform the data for instance by summarising it in some manner (&lt;code&gt;sum&lt;/code&gt;, &lt;code&gt;density&lt;/code&gt;, &lt;code&gt;smooth&lt;/code&gt;…)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Position adjustments&lt;/strong&gt;: apply minor changes to the position of elements (&lt;code&gt;jitter&lt;/code&gt;, &lt;code&gt;fill&lt;/code&gt;, &lt;code&gt;stack&lt;/code&gt;, &lt;code&gt;dodge&lt;/code&gt;, &lt;code&gt;identity&lt;/code&gt;)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- - Scales --&gt;
+
+&lt;!-- - Coordinate system --&gt;
+
+&lt;!-- - Faceting --&gt;
+
+&lt;!-- voir livre page 37 pour une reformulation ?vnentuelle --&gt;
+
+&lt;/div&gt;
+
+&lt;/section&gt;
+
+---
+
+## In a nutshell
+
+
+.center[![](lesson_figures/building_blocks_ggplot.png)]
 
 
 
 ---
 
-This function has also other arguments that may be useful for you when using it:
+# Syntax
 
---
-
-* `skip` to specify the number of lines to skip before reading the file
-* `na` to specify what should be considered as `NA` (for ex: you could put `na = "Not answered"`)
-* `col_names` to specify the names of the columns you want to have in your dataset.
-* See `?read_csv` for other arguments.
-
----
-
-# Tibble vs dataframe
-
-Let us take a look at the data we have imported.
 
 
 ```r
+library(ggplot2)
+ggplot(data = &lt;DATA&gt;,
+       aes(x = &lt;X AXIS VARIABLE&gt;,
+           y = &lt;Y AXIS VARIABLE&gt;, ... ), ...) +
+
+  geom_&lt;TYPE&gt;(aes(size = &lt;SIZE VARIABLE&gt;, ...),
+                   data = &lt;DATA&gt;,
+                   stat = &lt;FUNCTION&gt;,
+                   position = &lt;POSITION&gt;,
+                   color = &lt;"COLOR"&gt;, ...) +
+
+  scale_&lt;AESTHETIC&gt;_&lt;TYPE&gt;(name = &lt;NAME&gt;,
+                   breaks = &lt;WHERE&gt;,
+                   labels = &lt;LABELS&gt;, ... ) +
+
+  theme(...) +
+  facet_&lt;TYPE&gt;(&lt;FORMULA&gt;)
+```
+
+
+---
+
+
+### What happens when we create a simple ggplot() object ?
+
+
+```r
+library(ggplot2)
+ggplot()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+### Almost nothing
+
+
+---
+
+
+### Specify data
+
+
+
+```r
+data("mpg")
+head(mpg)
+```
+
+```
+## # A tibble: 6 x 11
+##   manufacturer model displ  year   cyl trans      drv     cty   hwy fl    class 
+##   &lt;chr&gt;        &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;      &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; 
+## 1 audi         a4      1.8  1999     4 auto(l5)   f        18    29 p     compa~
+## 2 audi         a4      1.8  1999     4 manual(m5) f        21    29 p     compa~
+## 3 audi         a4      2    2008     4 manual(m6) f        20    31 p     compa~
+## 4 audi         a4      2    2008     4 auto(av)   f        21    30 p     compa~
+## 5 audi         a4      2.8  1999     6 auto(l5)   f        16    26 p     compa~
+## 6 audi         a4      2.8  1999     6 manual(m5) f        18    26 p     compa~
+```
+
+```r
+# See ?economics for the description of the dataset
+```
+
+---
+
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))
+p
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+### Almost nothing ? Look at the axes :-)
+
+
+---
+
+### Let's specify what sort of plot we want, using a `geom_*` functions
+
+
+
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))
+p + geom_point()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Another `geom_*`
+
+
+
+
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))
+p + geom_smooth()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+### Combine two `geom` ?
+
+Simply __add__ as many geom_functions as you want
+
+
+
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))
+p + 
+  geom_smooth() + 
+  geom_point()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Combine three `geom` ?
+
+* Suppose we want to also look a linear thrend
+
+* Need for help
+
+
+```r
+?geom_smooth
+```
+---
+
+.center[&lt;img src="lesson_figures/help_geom_smooth.jpg" style="width: 80%" /&gt;]
+
+
+---
+
+
+
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))
+p + 
+  geom_smooth() + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+### There are *many* `geom_*` functions:
+
+
+```r
+ls("package:ggplot2")[grepl(ls("package:ggplot2"),pattern =  "geom")]
+```
+
+```
+##  [1] "geom_abline"            "geom_area"              "geom_bar"              
+##  [4] "geom_bin2d"             "geom_blank"             "geom_boxplot"          
+##  [7] "geom_col"               "geom_contour"           "geom_contour_filled"   
+## [10] "geom_count"             "geom_crossbar"          "geom_curve"            
+## [13] "geom_density"           "geom_density_2d"        "geom_density_2d_filled"
+## [16] "geom_density2d"         "geom_density2d_filled"  "geom_dotplot"          
+## [19] "geom_errorbar"          "geom_errorbarh"         "geom_freqpoly"         
+## [22] "geom_function"          "geom_hex"               "geom_histogram"        
+## [25] "geom_hline"             "geom_jitter"            "geom_label"            
+## [28] "geom_line"              "geom_linerange"         "geom_map"              
+## [31] "geom_path"              "geom_point"             "geom_pointrange"       
+## [34] "geom_polygon"           "geom_qq"                "geom_qq_line"          
+## [37] "geom_quantile"          "geom_raster"            "geom_rect"             
+## [40] "geom_ribbon"            "geom_rug"               "geom_segment"          
+## [43] "geom_sf"                "geom_sf_label"          "geom_sf_text"          
+## [46] "geom_smooth"            "geom_spoke"             "geom_step"             
+## [49] "geom_text"              "geom_tile"              "geom_violin"           
+## [52] "geom_vline"             "guide_geom"             "update_geom_defaults"
+```
+
+---
+
+### Quick look around of some classical  `geom_*` functions: `geom_histogram`
+
+
+
+```r
+ggplot(data = mpg, aes(x = displ)) +
+  geom_histogram()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Quick look around of some classical  `geom_*` functions: `geom_density`
+
+
+
+
+```r
+ggplot(data = mpg, aes(x = displ)) +
+  geom_density(fill = "blue", alpha = .3) # alpha: transparency
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+### Quick look around of some classical  `geom_*` functions: `geom_boxplot`
+
+
+
+```r
+ggplot(data = mpg, aes(x = manufacturer, y = cty)) +
+  geom_boxplot()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Quick look around of some classical  `geom_*` functions: `geom_bar`
+
+
+
+```r
+ggplot(data = mpg, aes(x = manufacturer)) +
+  geom_bar(alpha = .3, col = "purple", fill = "red") # col = borders ; fill = colour inside
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+### Take a look at this site to choose a plot
+[https://www.data-to-viz.com/](https://www.data-to-viz.com/)
+
+
+.center[&lt;img src="lesson_figures/data2viz.jpg" style="width: 150%" /&gt;]
+
+
+---
+
+class: center, middle
+
+# .large[Is everything clear ?]
+
+&lt;img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" /&gt;
+
+
+&lt;!-- --- --&gt;
+
+
+
+&lt;!-- &lt;img src="lesson_figures/break.jpg" style="width: 80%" /&gt; --&gt;
+
+&lt;!-- -- --&gt;
+
+&lt;!-- .large[~ 15 minutes] --&gt;
+
+
+---
+
+# Exercises
+
+
+.large[~ 20 minutes]
+
+--
+  
+.large[*Open "ggplot2_basics" with Rstudio*]
+
+
+
+
+---
+
+class: inverse, middle, center
+
+## GGPLOT2: Aesthetics / Facets / Labs
+
+
+.center[&lt;img src="lesson_figures/meme_part_2.jpg" style="width: 60%" /&gt;]
+
+
+---
+
+* One may want to :
+
+--
+
+### add color/transparency to the points
+
+--
+
+### do one plot for each manufacturer (or modality of a given factor)
+
+--
+
+### specify a title/subtitle to the plot
+
+
+
+---
+
+## Aesthetics, basics
+
+&lt;section data-transition="linear" data-transition-speed="default" class="present" style="display: block;"&gt;
+&lt;h3&gt;Aesthetic mapping vs. parameter setting&lt;/h3&gt;
+&lt;div class="slideContent small-code"&gt;
+&lt;p&gt;Aesthetic mapping:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Data value determines visual characteristic&lt;/li&gt;
+&lt;li&gt;use &lt;code&gt;aes()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class="r"&gt;&lt;span class="identifier"&gt;ggplot&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="identifier"&gt;diamonds&lt;/span&gt;, &lt;span class="identifier"&gt;aes&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="identifier"&gt;x&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="identifier"&gt;carat&lt;/span&gt;, &lt;span class="identifier"&gt;y&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="identifier"&gt;price&lt;/span&gt;, &lt;span class="identifier"&gt;color&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="identifier"&gt;clarity&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt; &lt;span class="operator"&gt;+&lt;/span&gt; &lt;span class="identifier"&gt;geom_point&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Setting:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Constant value determines visual characteristic&lt;/li&gt;
+&lt;li&gt;Use parameter in &lt;code&gt;geom_&amp;lt;TYPE&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;/p&gt;&lt;center&gt;&lt;p&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class="r"&gt;&lt;span class="identifier"&gt;ggplot&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="identifier"&gt;diamonds&lt;/span&gt;, &lt;span class="identifier"&gt;aes&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="identifier"&gt;x&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="identifier"&gt;carat&lt;/span&gt;, &lt;span class="identifier"&gt;y&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="identifier"&gt;price&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt; &lt;span class="operator"&gt;+&lt;/span&gt; &lt;span class="identifier"&gt;geom_point&lt;/span&gt;&lt;span class="paren"&gt;(&lt;/span&gt;&lt;span class="identifier"&gt;color&lt;/span&gt; &lt;span class="operator"&gt;=&lt;/span&gt; &lt;span class="string"&gt;"red"&lt;/span&gt;&lt;span class="paren"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;/div&gt;
+
+&lt;/section&gt;
+
+
+---
+
+* Let's take another dataset
+
+
+```r
+data(diamonds)
+data_work &lt;- diamonds[sample(1:nrow(diamonds), 5000),] # take 10000 random values of diamonds
 head(data_work)
 ```
 
 ```
-## # A tibble: 6 x 5
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  
-## 1          5.1         3.5          1.4         0.2 setosa 
-## 2          4.9         3            1.4         0.2 setosa 
-## 3          4.7         3.2          1.3         0.2 setosa 
-## 4          4.6         3.1          1.5         0.2 setosa 
-## 5          5           3.6          1.4         0.2 setosa 
-## 6          5.4         3.9          1.7         0.4 setosa
+## # A tibble: 6 x 10
+##   carat cut       color clarity depth table price     x     y     z
+##   &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  0.3  Very Good I     SI1      63.3    59   506  4.3   4.23  2.7 
+## 2  1    Ideal     E     SI2      61.8    57  4743  6.39  6.43  3.96
+## 3  0.73 Fair      I     VS1      55.9    66  2330  6.11  6.01  3.39
+## 4  0.38 Ideal     E     VS1      60.7    56   933  4.7   4.72  2.86
+## 5  0.58 Ideal     F     VVS2     61.8    56  2263  5.37  5.41  3.33
+## 6  1    Ideal     F     VVS2     61.9    57  9354  6.47  6.42  3.99
 ```
-
---
-
-Note the particular output of the print:
-
-* *A tibble*
-* The  type of each column is written under each col_name
-
----
-
-### The tibble is an alternative to the classical `data.frame` of base R
-
---
-
-As part of the tidyverse, it is mainly used in the tidyverse' packages.
-
---
-
-__The difference should not worry you__: the main difference with a classical dataframe is the nicer output when printing (run `iris` in R to see the difference). 
-
---
-
-By the way, note that a tibble __is a data.frame__
-
 
 ```r
-is.data.frame(data_work)
-```
-
-```
-## [1] TRUE
-```
-
-
-
----
-
-## An other package of the `tidyverse` : `readxl` to read .xlsx files
-
-The function `read_xlsx` allows you to read .xlsx files.
-
---
-
-Some arguments are useful for you:
-
-* `sheet` : name of the sheet of the file you want to read (if you provide a string), or position of the sheet you want to read (if you provide an integer)
-* same arguments as `read_csv` (`na`, `skip` etc.)
-* see `?read_xlsx` for details.
-
----
-
-class: center, middle
-
-# .large[Is everything ok until now ?]
-
-&lt;img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" /&gt;
-
----
-class: center, middle
-
-# Exercises
-
-.large[~ 30 minutes]
-
---
-
-.large[*File  --&gt; New project --&gt; Version Control --&gt;  Git  --&gt; Copy paste deposit URL*]
-
-OR 
-
-.large[*Download the zip Github depository, open "Import_data_exercises.Rmd" with Rstudio*]
-
-
-
----
-
-## Manipulate your data using `dplyr`
-
-`dplyr` is a package of the `tidyverse` designed to manipulate your data easily.
-
-
---
-
-&gt; what do we mean by manipulating the data easily ?
-
-
---
-
-Select columns, filter their rows, create new columns etc.
-
---
-
-&lt;!-- .center[![](lesson_figures/dplyr1.jpg)] --&gt;
-.center[&lt;img src="lesson_figures/dplyr1.jpg" style="width: 75%" /&gt;]
-
----
-
-Let us consider the dataset `data_work` previously introduced (it is simply the well know `iris` dataset turned into tibble). 
-
-
-```
-## # A tibble: 150 x 5
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  
-## 1          5.1         3.5          1.4         0.2 setosa 
-## 2          4.9         3            1.4         0.2 setosa 
-## 3          4.7         3.2          1.3         0.2 setosa 
-## 4          4.6         3.1          1.5         0.2 setosa 
-## 5          5           3.6          1.4         0.2 setosa 
-## 6          5.4         3.9          1.7         0.4 setosa 
-## # ... with 144 more rows
-```
-
-Let us see the manipulations we can do on this dataset.
-
----
-
-## `dplyr::select`
-
-In a data analysis, we could be interested in:
-
-* *select* some columns, for instance:
-  + *select* the 3rd column
-
---
-
-
-```r
-select(data_work, `3`)
-```
-
-
-```
-## # A tibble: 150 x 1
-##   Petal.Length
-##          &lt;dbl&gt;
-## 1          1.4
-## 2          1.4
-## 3          1.3
-## 4          1.5
-## 5          1.4
-## 6          1.7
-## # ... with 144 more rows
-```
-
-
----
-
-## `dplyr::select`
-
-In a data analysis, we could be interested in:
-
-* *select* some columns, for instance:
-  + *select* column Sepal.Width
-
---
-
-
-```r
-select(data_work, `Sepal.Width`) 
-# Note the absence of " around Sepal .Width
-```
-
-
-```
-## # A tibble: 150 x 1
-##   Sepal.Width
-##         &lt;dbl&gt;
-## 1         3.5
-## 2         3  
-## 3         3.2
-## 4         3.1
-## 5         3.6
-## 6         3.9
-## # ... with 144 more rows
-```
-
----
-
-## `dplyr::select`
-
-In a data analysis, we could be interested in:
-
-* *select* some columns, for instance:
-  + *select*  all columns except Sepal.width and Sepal.Length)
-  
---
-
-
-```r
-select(data_work, `- c(Sepal.Width, Sepal.Length)`)
-```
-
-
-```
-## # A tibble: 150 x 3
-##   Petal.Length Petal.Width Species
-##          &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  
-## 1          1.4         0.2 setosa 
-## 2          1.4         0.2 setosa 
-## 3          1.3         0.2 setosa 
-## 4          1.5         0.2 setosa 
-## 5          1.4         0.2 setosa 
-## 6          1.7         0.4 setosa 
-## # ... with 144 more rows
-```
-
---
-
-Note the absence of " around Sepal.Width and Sepal.Length,
-and the __-__ that means __except__
-
----
-
-## `dplyr::select`: helpers()
-
-`select()` is provided with many *functions helpers* that you can use to select columns, for instance:
-
-* `select(data_work, contains("pal"))`: all columns of `data_work` with a name containing "pal"
-
---
-
-* `select(data_work, starts_with("Se"))`: *can you guess it ?*
-
---
-
-* `select(data_work, ends_with("th"))`: *can you guess it ?*
-
---
-
-* `select(data_work, matches("*th"))`: *can you guess it ?* (select columns with a name matching a regular expression)
-
---
-
-&gt; .large[That's one of the assets of the dplyr syntax: it looks like almost natural language.]
-
----
-  
-## `dplyr::filter`
-
-In a data analysis, we could be interested in:
-
-* *filter* rows based on the values of some columns (predicates), for instance:
-  + *filter* rows of `data_work` with individuals having their length of Sepal greater than 4
-
---
-
-```r
-filter(data_work, `Sepal.Length &gt; 4`)
-```
-
-
-```
-## # A tibble: 150 x 5
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  
-## 1          5.1         3.5          1.4         0.2 setosa 
-## 2          4.9         3            1.4         0.2 setosa 
-## 3          4.7         3.2          1.3         0.2 setosa 
-## 4          4.6         3.1          1.5         0.2 setosa 
-## 5          5           3.6          1.4         0.2 setosa 
-## 6          5.4         3.9          1.7         0.4 setosa 
-## # ... with 144 more rows
-```
-
----
-
-
-## `dplyr::filter`
-
-In a data analysis, we could be interested in:
-
-* *filter* rows based on the values of some columns (predicates), for instance:
-  + *filter* rows of `data_work` of species "virginica"
-
---
-
-
-
-```r
-filter(data_work, `Species == "virginica"`)
-```
-
-
-```
-## # A tibble: 50 x 5
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species  
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;    
-## 1          6.3         3.3          6           2.5 virginica
-## 2          5.8         2.7          5.1         1.9 virginica
-## 3          7.1         3            5.9         2.1 virginica
-## 4          6.3         2.9          5.6         1.8 virginica
-## 5          6.5         3            5.8         2.2 virginica
-## 6          7.6         3            6.6         2.1 virginica
-## # ... with 44 more rows
-```
-
-
----
-
-## `dplyr::filter`
-  
-You can put multiple conditions, for instance:
-
-* *filter* rows based on the values of some columns (predicates), for instance:
-  + *filter* rows of `data_work` of species "virginica" and with their Width of Petal smaller than 2
-
---
-
-
-```r
-filter(data_work, `Species == "virginica", Petal.Width &lt; 2`)
-```
-
-
-```
-## # A tibble: 21 x 5
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species  
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;    
-## 1          5.8         2.7          5.1         1.9 virginica
-## 2          6.3         2.9          5.6         1.8 virginica
-## 3          4.9         2.5          4.5         1.7 virginica
-## 4          7.3         2.9          6.3         1.8 virginica
-## 5          6.7         2.5          5.8         1.8 virginica
-## 6          6.4         2.7          5.3         1.9 virginica
-## # ... with 15 more rows
-```
-
----
-class: center, middle
-
-&gt; .large[Again, it looks like the natural language !]
-
---
-
-.large[*That's one of the nicer things in the `dplyr` syntax.*]
-
----
-
-## `dplyr::mutate`
-
---
-
-`mutate` is the verb used to create new columns.
-
---
-
-For instance, suppose we want to compute the sum of the lengths of the Sepal and the Petal in our dataset.
-
---
-
-
-```r
-mutate(data_work, sum_lengths = Sepal.Length + Petal.Length)
-```
-
-```
-## # A tibble: 150 x 6
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species sum_lengths
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;
-## 1          5.1         3.5          1.4         0.2 setosa          6.5
-## 2          4.9         3            1.4         0.2 setosa          6.3
-## 3          4.7         3.2          1.3         0.2 setosa          6  
-## 4          4.6         3.1          1.5         0.2 setosa          6.1
-## 5          5           3.6          1.4         0.2 setosa          6.4
-## 6          5.4         3.9          1.7         0.4 setosa          7.1
-## # ... with 144 more rows
-```
-
----
-
-## `dplyr`: other useful functions
-
-
-.small[`dplyr` provides many useful functions. You can guess their purposes just by their name:]
-
---
-
-* `arrange`: `arrange(data_work, Species, desc(Petal.Length))`
-
---
-
-
-```
-## # A tibble: 150 x 5
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  
-## 1          4.8         3.4          1.9         0.2 setosa 
-## 2          5.1         3.8          1.9         0.4 setosa 
-## 3          5.4         3.9          1.7         0.4 setosa 
-## 4          5.7         3.8          1.7         0.3 setosa 
-## 5          5.4         3.4          1.7         0.2 setosa 
-## 6          5.1         3.3          1.7         0.5 setosa 
-## # ... with 144 more rows
-```
-
----
-
-## `dplyr`: other useful functions
-
-
-.small[`dplyr` provides many useful functions. You can guess their purposes just by their name:]
-
---
-
-* `distinct`: `distinct(data_work, Species)`
-
---
-
-
-```
-## # A tibble: 3 x 1
-##   Species   
-##   &lt;chr&gt;     
-## 1 setosa    
-## 2 versicolor
-## 3 virginica
-```
-
----
-
-## `dplyr`: other useful functions
-
-
-.small[`dplyr` provides many useful functions. You can guess their purposes just by their name:]
-
---
-
-* `rename`: `rename(data_work, S.Width = Sepal.Width, S.Length = Sepal.Length)`
-
---
-
-
-```
-## # A tibble: 150 x 5
-##   S.Length S.Width Petal.Length Petal.Width Species
-##      &lt;dbl&gt;   &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  
-## 1      5.1     3.5          1.4         0.2 setosa 
-## 2      4.9     3            1.4         0.2 setosa 
-## 3      4.7     3.2          1.3         0.2 setosa 
-## 4      4.6     3.1          1.5         0.2 setosa 
-## 5      5       3.6          1.4         0.2 setosa 
-## 6      5.4     3.9          1.7         0.4 setosa 
-## # ... with 144 more rows
-```
-
-
----
-
-class: center, middle
-
-# .large[Is everything clear ?]
-
-&lt;img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" /&gt;
-
-
----
-
-class: center, middle
-
-
-&lt;img src="lesson_figures/break.jpg" style="width: 80%" /&gt;
-
---
-
-.large[~ 10 minutes]
-
-
----
-
-
-# Chain commands using %&gt;% (pipe) operator
-
-The %&gt;% (pronounce pipe) provides a convenient way to code, as it allows the code to be written in chain. 
-
-.center[![](lesson_figures/this_is_not_a_pipe.jpg)]
-
---
-
-&gt; __IMPORTANT__: the keyboard shortcut for %&gt;% is *ctrl + shift + M*
-
---
-
-&gt; Try it !
-
----
-
-For instance, suppose we want to:
-
-1. *filter* rows of `data_work` of species "virginica" and with their Width of Petal smaller than 2
-2. *then* compute the sum of the lengths of the Sepal and the Petal in our dataset.
-3. *then* select the columns with their name starting with an `\(S\)`
-4. *then* arrange the result by length of Sepal.Length
-
-We would write
-
---
-
-
-```r
-arrange(select(mutate(filter(data_work, Species == 'virginica', Petal.Width &lt;2), Sum_lengths = Sepal.Length + Petal.Length), starts_with("S")), Sepal.Length)
-```
-
---
-
-&gt; Isn't it unreadable ?!
-
----
-
-Let's write it using the %&gt;% operator:
-
---
-
-
-```r
-data_work %&gt;% 
-  filter(Species == 'virginica', Petal.Width &lt; 2) %&gt;% 
-  mutate(Sum_lengths = Sepal.Length + Petal.Length) %&gt;% 
-  select(starts_with("S")) %&gt;% 
-  arrange(Sepal.Length)
-```
-
-
---
-
-
-You see how clearer it looks ?
-
---
-
-
-If I run this: `x %&gt;% sum` it is strictly equivalent to `sum(x)`.
-
-
---
-
-It means: take `x` and pass it through the function `sum`.
----
-
-.small[Another example to see the power of %&gt;%. Suppose I want to carry out the following steps:]
-
---
-
-.small[1. Take `data_work`
-2. Select variables containing "Sepal", and "Petal.Width" and "Species"
-3. Filter rows with length of Sepal greater than 5
-4. Fit a linear model of Petal.Width vs Sepal.Width + Sepal.Length + Species
-5. Print a summary of the model]
-
-
---
-
-
-```r
-data_work %&gt;% `#Step 1`
-  select(contains("Sepal") ,
-         Petal.Width, Species) %&gt;% `# Step 2`
-  filter(Sepal.Length &gt;5) %&gt;% `# Step 3`
-  lm(Petal.Width ~ Sepal.Width + Sepal.Length + Species,
-     data= .) %&gt;% `# Step 4: NOTE THE .`
-  summary `# Step 5`
-```
-
-
-```
-## 
-## Call:
-## lm(formula = Petal.Width ~ Sepal.Width + Sepal.Length + Species, 
-##     data = .)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -0.48660 -0.10718 -0.00351  0.12237  0.46503 
-## 
-## Coefficients:
-##                   Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)       -1.14888    0.24851  -4.623 1.01e-05 ***
-## Sepal.Width        0.31463    0.06437   4.888 3.40e-06 ***
-## Sepal.Length       0.04850    0.03937   1.232     0.22    
-## Speciesversicolor  1.32247    0.08861  14.924  &lt; 2e-16 ***
-## Speciesvirginica   1.92157    0.09602  20.012  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.1902 on 113 degrees of freedom
-## Multiple R-squared:  0.9225,	Adjusted R-squared:  0.9198 
-## F-statistic: 336.4 on 4 and 113 DF,  p-value: &lt; 2.2e-16
+# See ?diamonds for the description of the dataset
 ```
 
 ---
 
 
 ```r
-data_work %&gt;% `#Step 1`
-  select(contains("Sepal") ,
-         Petal.Width, Species) %&gt;% `# Step 2`
-  filter(Sepal.Length &gt; 5) %&gt;% `# Step 3`
-  lm(Petal.Width ~ Sepal.Width + Sepal.Length + Species,
-     data= `.`) %&gt;% `# Step 4: NOTE THE .`
-  summary `# Step 5`
+str(data_work)
 ```
 
---
-
-In this example, it is also important to notice the .large[__.__] . When using the pipe, the "." is the object refering to what's before the last %&gt;% .
-
---
-
-It is important to specify it when the argument that needs the object before the last %&gt;% is not the first argument.That's why we had to specify it in the `lm` function and not in the `select` function.
-
----
-
-# Group operations
-
-.large[An important features of `dplyr` is its ability to *group* tibbles and compute operations on these *grouped* tibbles.]
-
---
-
-.large[A *key* function of `dplyr` is `group_by`.]
+```
+## tibble [5,000 x 10] (S3: tbl_df/tbl/data.frame)
+##  $ carat  : num [1:5000] 0.3 1 0.73 0.38 0.58 1 0.35 1 0.43 0.61 ...
+##  $ cut    : Ord.factor w/ 5 levels "Fair"&lt;"Good"&lt;..: 3 5 1 5 5 5 3 3 4 3 ...
+##  $ color  : Ord.factor w/ 7 levels "D"&lt;"E"&lt;"F"&lt;"G"&lt;..: 6 2 6 2 3 3 4 5 4 6 ...
+##  $ clarity: Ord.factor w/ 8 levels "I1"&lt;"SI2"&lt;"SI1"&lt;..: 3 2 5 5 6 6 5 3 4 4 ...
+##  $ depth  : num [1:5000] 63.3 61.8 55.9 60.7 61.8 61.9 60.7 62.4 61.3 62.4 ...
+##  $ table  : num [1:5000] 59 57 66 56 56 57 61 58 58 57 ...
+##  $ price  : int [1:5000] 506 4743 2330 933 2263 9354 706 4574 1113 1572 ...
+##  $ x      : num [1:5000] 4.3 6.39 6.11 4.7 5.37 6.47 4.54 6.37 4.86 5.4 ...
+##  $ y      : num [1:5000] 4.23 6.43 6.01 4.72 5.41 6.42 4.58 6.42 4.83 5.43 ...
+##  $ z      : num [1:5000] 2.7 3.96 3.39 2.86 3.33 3.99 2.77 3.99 2.97 3.38 ...
+```
 
 ---
 
-## `dplyr::group_by`
+
+* Price vs carat ?
+
 
 --
 
 
 ```r
-data_work_by_species &lt;- data_work %&gt;%
-  `group_by`(Species) 
-# Equivalent to data_work_by_species &lt;- group_by(data_work, Species)
-
-data_work_by_species
+p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
+  geom_point()
+p_diamonds
 ```
 
+&lt;img src="index_files/figure-html/unnamed-chunk-20-1.svg" style="display: block; margin: auto;" /&gt;
 
-```
-## # A tibble: 150 x 5
-## # Groups:   Species [3]
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  
-## 1          5.1         3.5          1.4         0.2 setosa 
-## 2          4.9         3            1.4         0.2 setosa 
-## 3          4.7         3.2          1.3         0.2 setosa 
-## 4          4.6         3.1          1.5         0.2 setosa 
-## 5          5           3.6          1.4         0.2 setosa 
-## 6          5.4         3.9          1.7         0.4 setosa 
-## # ... with 144 more rows
-```
+
+---
+
+* We want the points to be green
+
 --
 
-Note the `# Groups:   Species [3]`. It means that operations on this dataset will be done for each group.
-
----
-
-For example, suppose we want to compute the median of the width of the Sepal for each species.
-
-
-```r
-data_work_by_species %&gt;%
-  mutate(median_sepal_width = median(Sepal.Width)) %&gt;% 
-  select(starts_with("S"), median_sepal_width)
-```
-
-```
-## # A tibble: 150 x 4
-## # Groups:   Species [3]
-##   Sepal.Length Sepal.Width Species median_sepal_width
-##          &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;                &lt;dbl&gt;
-## 1          5.1         3.5 setosa                 3.4
-## 2          4.9         3   setosa                 3.4
-## 3          4.7         3.2 setosa                 3.4
-## 4          4.6         3.1 setosa                 3.4
-## 5          5           3.6 setosa                 3.4
-## 6          5.4         3.9 setosa                 3.4
-## # ... with 144 more rows
-```
-
-It's nice, but we may also need to summarise the table, just keep a summary of the Species and the median.
-
----
-
-`dplyr::summarise`
-
-It is easily done by the function `summarise`
+* This does not depend on the data `\(\rightarrow\)` We specify the color argument *outside* `aes`
 
 --
 
 
 ```r
-data_work_by_species %&gt;%
-  summarise(median_sepal_width = median(Sepal.Width)) 
+p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
+  geom_point(col = "green")
+p_diamonds
 ```
 
-```
-## # A tibble: 3 x 2
-##   Species    median_sepal_width
-##   &lt;chr&gt;                   &lt;dbl&gt;
-## 1 setosa                    3.4
-## 2 versicolor                2.8
-## 3 virginica                 3
-```
+&lt;img src="index_files/figure-html/unnamed-chunk-21-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
-If you want to take out the grouped structure of your tibble, you just have to use the function `ungroup`
+* One shape for each for each number of cylinders of the cars
 
-
-```r
-data_work_by_species %&gt;% ungroup
-```
-
-```
-## # A tibble: 150 x 5
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  
-## 1          5.1         3.5          1.4         0.2 setosa 
-## 2          4.9         3            1.4         0.2 setosa 
-## 3          4.7         3.2          1.3         0.2 setosa 
-## 4          4.6         3.1          1.5         0.2 setosa 
-## 5          5           3.6          1.4         0.2 setosa 
-## 6          5.4         3.9          1.7         0.4 setosa 
-## # ... with 144 more rows
-```
-
----
-## Functions to join tables
-
-.center[&lt;img src="lesson_figures/figure_join_table.png" style="width: 60%" /&gt;
-&lt;img src="lesson_figures/figure_join_exemples.png" style="width: 50%" /&gt;]
-
-
-.small[Image from [RStudio data transformation cheatsheet](https://www.rstudio.com/resources/cheatsheets/)]
----
-
-# Since `dplyr` 1.0: function `dplyr::across`
 
 --
 
-To help apply a function over multiple columns, `dplyr` came with the function `across`
-
---
-
-General syntax is: .small[`across(.cols = THE COLUMNS ON WHICH YOU WANT TO APPLY THE FUNCTION(S), .fns = THE FUNCTION YOU WANT TO APPLY, ...)`]
-
---
-
-See `?dplyr::across` for more details and further arguments
-
----
-
-Combined with the `where` function, it allows to apply a function on specific columns
-
-
-```r
-data_work %&gt;% 
-  mutate(across(where(is.character), as.factor)) `# apply function as.factor where the columns have the type character`
-```
-
-
-```
-## # A tibble: 150 x 5
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;  
-## 1          5.1         3.5          1.4         0.2 setosa 
-## 2          4.9         3            1.4         0.2 setosa 
-## 3          4.7         3.2          1.3         0.2 setosa 
-## 4          4.6         3.1          1.5         0.2 setosa 
-## 5          5           3.6          1.4         0.2 setosa 
-## 6          5.4         3.9          1.7         0.4 setosa 
-## # ... with 144 more rows
-```
-
-
----
-
-You can specify the name and a specific functions using the `~.x` syntax. `.names` is used to specify the names of the new columns. It has a specific syntax (see `?dplyr::across`).
+* This *depends*  on the data `\(\rightarrow\)` We specify the color argument *inside* `aes`
 
 --
 
 
 ```r
-data_work %&gt;% 
-  mutate(across(where(is.numeric), ~ .x*0.01, .names = "{.col}_in_meters" )) `# apply personal function where the columns have the type numeric`
+p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
+  geom_point(aes(`col = cut`)) `#Says to ggplot2, give on color to each modality of cut`
+p_diamonds
 ```
 
 
-```
-## # A tibble: 150 x 9
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species Sepal.Length_in_met~
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;                  &lt;dbl&gt;
-## 1          5.1         3.5          1.4         0.2 setosa                 0.051
-## 2          4.9         3            1.4         0.2 setosa                 0.049
-## 3          4.7         3.2          1.3         0.2 setosa                 0.047
-## 4          4.6         3.1          1.5         0.2 setosa                 0.046
-## 5          5           3.6          1.4         0.2 setosa                 0.05 
-## 6          5.4         3.9          1.7         0.4 setosa                 0.054
-## # ... with 144 more rows, and 3 more variables: Sepal.Width_in_meters &lt;dbl&gt;,
-## #   Petal.Length_in_meters &lt;dbl&gt;, Petal.Width_in_meters &lt;dbl&gt;
-```
+&lt;img src="index_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
-class: center, middle
+* One color for each for each color of the diamond, one shape for each cut of the diamond
 
-# .large[Do you have questions ?]
+--
 
-&lt;img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" /&gt;
+* This *depends*  on the data `\(\rightarrow\)` We specify the color and shape arguments *inside* `aes`
+
+--
+
+
+```r
+p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
+  geom_point(aes(`col = color, shape = cut`)) `#Says to ggplot2, give on shape to each modality of cut, one color to each diamond color`
+p_diamonds
+```
+
+
+&lt;img src="index_files/figure-html/unnamed-chunk-25-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+* If the variable mapped to color is continuous, then the scale of the colour becomes automatically continuous
+
+--
+
+
+```r
+p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
+  geom_point(aes(col = depth),
+             alpha = .1) #Says to ggplot2, give on color based on the value of depth
+#Put transparency on 0.1, regardless of the points' values
+p_diamonds
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-26-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Working with aesthetics: scale
+
+
+```r
+p_diamonds + scale_color_continuous(low = "blue", high = "red")
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
-class: center, middle
+
+### Working with aesthetics: scale
+
+&lt;img src="index_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+## Facet: draw multiple plots easily
+
+
+* Distribution of prices for the whole dataset:
+
+
+--
+
+
+```r
+histogram_prices &lt;- ggplot(data_work, aes(x = price)) + # No need for a y as we only need an histogram
+  geom_histogram()
+histogram_prices
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+* What if we want the distributions of prices *for each* modality of the *cut* variable
+
+
+---
+
+We simply need to use the `facet_wrap` function:
+
+
+```r
+histogram_prices + 
+  facet_wrap(cut~. )
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-30-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+We can use the `scales` argument, to let scales vary freely across plots
+
+
+```r
+histogram_prices + 
+  facet_wrap(cut~., scales = "free_y" )
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+* We can also make a grid of plots, using `facet_grid` function
+
+
+
+```r
+histogram_prices + 
+  facet_grid(cut~color,scales = "free_y")
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Titles and subtitles: say what you show, and show what you say
+
+
+* Many ways exist to specify titles in ggplot
+
+--
+
+* The easiest one may be to use the `labs` function
+
+--
+
+
+* Let's take another dataset
+
+
+```r
+data(economics)
+head(economics)
+```
+
+```
+## # A tibble: 6 x 6
+##   date         pce    pop psavert uempmed unemploy
+##   &lt;date&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+## 1 1967-07-01  507. 198712    12.6     4.5     2944
+## 2 1967-08-01  510. 198911    12.6     4.7     2945
+## 3 1967-09-01  516. 199113    11.9     4.6     2958
+## 4 1967-10-01  512. 199311    12.9     4.9     3143
+## 5 1967-11-01  517. 199498    12.8     4.7     3066
+## 6 1967-12-01  525. 199657    11.8     4.8     3018
+```
+
+```r
+str(economics)
+```
+
+```
+## spec_tbl_df [574 x 6] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+##  $ date    : Date[1:574], format: "1967-07-01" "1967-08-01" ...
+##  $ pce     : num [1:574] 507 510 516 512 517 ...
+##  $ pop     : num [1:574] 198712 198911 199113 199311 199498 ...
+##  $ psavert : num [1:574] 12.6 12.6 11.9 12.9 12.8 11.8 11.7 12.3 11.7 12.3 ...
+##  $ uempmed : num [1:574] 4.5 4.7 4.6 4.9 4.7 4.8 5.1 4.5 4.1 4.6 ...
+##  $ unemploy: num [1:574] 2944 2945 2958 3143 3066 ...
+```
+
+```r
+# See ?economics for the description of the dataset
+```
+
+---
+
+
+```r
+plot_unemployed &lt;- ggplot(data = economics, aes(x  =date, y = unemploy)) + 
+  geom_line() + 
+  geom_smooth(se = FALSE) + 
+  geom_smooth(span = 0.05, col = "green", se = FALSE ) 
+
+plot_unemployed
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-34-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+* Adding a title is straightforward
+
+--
+
+```r
+plot_unemployed + 
+  labs(title = "Number of unemployed people (in thousands) in the USA")
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-35-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+* Adding subtitle/caption is also straightforward
+
+--
+
+
+```r
+plot_unemployed + 
+  labs(title = "Number of unemployed people (in thousands) in the USA", 
+       subtitle = "From 1967 to 2015", 
+       caption = "Copyright Remi Mahmoud :-)")
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-36-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+* Adding modifying axes titles is also straightforward
+
+--
+
+
+```r
+plot_unemployed + 
+  labs(title = "Number of unemployed people (in thousands) in the USA",
+       subtitle = "From 1967 to 2015",
+       caption = "Copyright Remi Mahmoud :-)", x = "DATE", y = "Number of unemployed people")
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-37-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+
+* Title of a legend can also be changed using the `labs` function
+
+
+```r
+p_diamonds+ `labs(colour = "Depth\nof the\ndiamond")`
+```
+
+
+&lt;img src="index_files/figure-html/unnamed-chunk-39-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
 
 # Exercises
 
@@ -1070,226 +1013,326 @@ class: center, middle
 .large[~ 20 minutes]
 
 --
+  
+.large[*Open "ggplot2_basics" with Rstudio*]
 
-.large[*Open "Manipulate_and_tidy_your_data_exercises.Rmd" with Rstudio*]
 
---
+---
 
-.large[*Answer to the questions until section "Tidy your data"*]
+
+
+
+
+class: inverse, middle, center
+
+## GGPLOT2: Customizing your plot
+
+.center[&lt;img src="lesson_figures/meme_full.jpg" style="width: 60%" /&gt;]
 
 
 
 ---
 
-# Tidy data
-
-1. Each variable must have its own column
-2. Each observation must have its row
-3. Each value must have its own cell
-
-![](lesson_figures/tidy-1.png)
-
----
-
-
+* One may want to :
 
 --
 
-For instance, imagine this dataset, giving the population of different countries in 2002 and 2007:
+### specify color / shapes of points / boxplots / bars
+
+--
+
+### change the sizes/font/orientation of labels / titles
+
+--
+
+### change the background
+
+
+---
+
+### Themes: global appearance of the plot
+
+* You may have notice the (horrible) grey background of the default plots
+
+--
+
+```r
+plot_population &lt;- ggplot(data = economics, aes(x  =date, y = pop)) + 
+  geom_line() +
+  labs(y = "Population")
+
+plot_population
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-40-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+Non-data elements, like background property, legend appearance, axis labels are handled by *themes* in `ggplot`.
+
+--
+
+We will se how to specify our own themes, but there are already some predefined themes (`theme_bw()`, `theme_minimal`) .
+
+--
+
+To modify the theme of a plot, simply add it to the ggplot object
+
+---
 
 
 ```r
-d %&gt;% head
+plot_population + theme_minimal()
 ```
 
-```
-## # A tibble: 6 x 3
-##   country       `2002`   `2007`
-##   &lt;chr&gt;          &lt;dbl&gt;    &lt;dbl&gt;
-## 1 Belgium     10311970 10392226
-## 2 France      59925035 61083916
-## 3 Germany     82350671 82400996
-## 4 Italy       57926999 58147733
-## 5 Spain       40152517 40448191
-## 6 Switzerland  7361757  7554661
-```
-
---
-
-* Is this dataset tidy ?
-
---
-
-This is dataset is __not__ tidy, as the population, which is an observed variable is not in a distinct column (principle 1.). Year is also a variable, so it should have its column too.
+&lt;img src="index_files/figure-html/unnamed-chunk-41-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-Instead, we should have:
-
-
-
-```
-## # A tibble: 6 x 3
-##   country year  population
-##   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt;
-## 1 Belgium 2002    10311970
-## 2 Belgium 2007    10392226
-## 3 France  2002    59925035
-## 4 France  2007    61083916
-## 5 Germany 2002    82350671
-## 6 Germany 2007    82400996
-```
-
-
----
-
-### Make tidy data
-
-Two key functions, of package `tidyr` are used to tidy the data:
-
---
-
-* `tidyr::pivot_longer` is used to make your dataset *longer* (what a surprise ! :O)
-* `tidyr::pivot_wider` is used to make your dataset *wider* (what a surprise ! :O)
-
-
-
----
-
-In practice:
 
 
 ```r
-#d is the dataset with the populations of the countries
-data_tidy &lt;- d %&gt;% pivot_longer(cols =  c("2002","2007"))
+plot_population + theme_bw()
+```
 
-head(data_tidy)
+&lt;img src="index_files/figure-html/unnamed-chunk-42-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+
+```r
+plot_population + theme_dark()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-43-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+.small[
+
+* Look at the (long) list of things you can modify in a theme
+
+
+```r
+(attributes_theme &lt;- names(theme_bw()))
 ```
 
 ```
-## # A tibble: 6 x 3
-##   country name     value
-##   &lt;chr&gt;   &lt;chr&gt;    &lt;dbl&gt;
-## 1 Belgium 2002  10311970
-## 2 Belgium 2007  10392226
-## 3 France  2002  59925035
-## 4 France  2007  61083916
-## 5 Germany 2002  82350671
-## 6 Germany 2007  82400996
+##  [1] "line"                       "rect"                      
+##  [3] "text"                       "title"                     
+##  [5] "aspect.ratio"               "axis.title"                
+##  [7] "axis.title.x"               "axis.title.x.top"          
+##  [9] "axis.title.x.bottom"        "axis.title.y"              
+## [11] "axis.title.y.left"          "axis.title.y.right"        
+## [13] "axis.text"                  "axis.text.x"               
+## [15] "axis.text.x.top"            "axis.text.x.bottom"        
+## [17] "axis.text.y"                "axis.text.y.left"          
+## [19] "axis.text.y.right"          "axis.ticks"                
+## [21] "axis.ticks.x"               "axis.ticks.x.top"          
+## [23] "axis.ticks.x.bottom"        "axis.ticks.y"              
+## [25] "axis.ticks.y.left"          "axis.ticks.y.right"        
+## [27] "axis.ticks.length"          "axis.ticks.length.x"       
+## [29] "axis.ticks.length.x.top"    "axis.ticks.length.x.bottom"
+## [31] "axis.ticks.length.y"        "axis.ticks.length.y.left"  
+## [33] "axis.ticks.length.y.right"  "axis.line"                 
+## [35] "axis.line.x"                "axis.line.x.top"           
+## [37] "axis.line.x.bottom"         "axis.line.y"               
+## [39] "axis.line.y.left"           "axis.line.y.right"         
+## [41] "legend.background"          "legend.margin"             
+## [43] "legend.spacing"             "legend.spacing.x"          
+## [45] "legend.spacing.y"           "legend.key"                
+## [47] "legend.key.size"            "legend.key.height"         
+## [49] "legend.key.width"           "legend.text"               
+## [51] "legend.text.align"          "legend.title"              
+## [53] "legend.title.align"         "legend.position"           
+## [55] "legend.direction"           "legend.justification"      
+## [57] "legend.box"                 "legend.box.just"           
+## [59] "legend.box.margin"          "legend.box.background"     
+## [61] "legend.box.spacing"         "panel.background"          
+## [63] "panel.border"               "panel.spacing"             
+## [65] "panel.spacing.x"            "panel.spacing.y"           
+## [67] "panel.grid"                 "panel.grid.major"          
+## [69] "panel.grid.minor"           "panel.grid.major.x"        
+## [71] "panel.grid.major.y"         "panel.grid.minor.x"        
+## [73] "panel.grid.minor.y"         "panel.ontop"               
+## [75] "plot.background"            "plot.title"                
+## [77] "plot.title.position"        "plot.subtitle"             
+## [79] "plot.caption"               "plot.caption.position"     
+## [81] "plot.tag"                   "plot.tag.position"         
+## [83] "plot.margin"                "strip.background"          
+## [85] "strip.background.x"         "strip.background.y"        
+## [87] "strip.placement"            "strip.text"                
+## [89] "strip.text.x"               "strip.text.y"              
+## [91] "strip.switch.pad.grid"      "strip.switch.pad.wrap"     
+## [93] "strip.text.y.left"
 ```
 
---
 
-The first argument is the dataset to tidy (which is not necessary to complete because of the %&gt;% ).
-
---
-
-The second is the name of the columns to gather.
+]
 
 
 ---
 
-We can also provide another names to the new columns using the arguments `values_to` and `names_to`.
+* Some of the attributes of a `theme` regard text's elements (titles, axis labels etc.)
+
+```r
+attributes_theme[grepl(attributes_theme, pattern = "text|title")]
+```
+
+```
+##  [1] "text"                "title"               "axis.title"         
+##  [4] "axis.title.x"        "axis.title.x.top"    "axis.title.x.bottom"
+##  [7] "axis.title.y"        "axis.title.y.left"   "axis.title.y.right" 
+## [10] "axis.text"           "axis.text.x"         "axis.text.x.top"    
+## [13] "axis.text.x.bottom"  "axis.text.y"         "axis.text.y.left"   
+## [16] "axis.text.y.right"   "legend.text"         "legend.text.align"  
+## [19] "legend.title"        "legend.title.align"  "plot.title"         
+## [22] "plot.title.position" "plot.subtitle"       "strip.text"         
+## [25] "strip.text.x"        "strip.text.y"        "strip.text.y.left"
+```
+--
+* Texts elements are modified using the `element_text()` function
 
 --
 
-The columns to gather can also be selected using the select helpers that we've seen previously:
+* `element_text()` can set the font, the color, the angle of the text setted (see `?element_text()` for a complete list)
 
+---
+### Modify texts elements
+
+
+```r
+p_diamonds +
+  theme_bw() +
+  labs(title = "A nice title") +
+  theme(axis.title.x = element_text(color = "red"), `# Modify title of the x axis`
+          axis.title.y = element_text(color = "orange"), `# Modify title of the y axis`
+        axis.text = element_text(angle = 180), # Modify the angle of `all` the axis texts
+        legend.title = element_text(size = 14 ),`# Modify the size of the legend title`
+        plot.title = element_text(face = "bold"), `# Modify the face of the plot title`
+        title = element_text(face = "italic")) # Modify the face of `ALL` titles
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-47-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Modify background of  elements
+
+* Background elements are modified using the `element_rect()` function
+
+
+```r
+attributes_theme[grepl(attributes_theme, pattern = "background")]
+```
+
+```
+## [1] "legend.background"     "legend.box.background" "panel.background"     
+## [4] "plot.background"       "strip.background"      "strip.background.x"   
+## [7] "strip.background.y"
+```
+---
+
+
+
+```r
+p_diamonds +
+  theme_bw() +
+  labs(title = "A nice title") +
+  theme(legend.background = element_rect(color = "black", linetype = "dashed"), `#modify the rectangle across the legend`
+        plot.background = element_rect(fill = "lightblue", colour = "purple"), `#guess what ?`
+        panel.background = element_rect(fill = "pink")) `#guess what ?`
+```
+
+--
+
+
+&lt;img src="index_files/figure-html/unnamed-chunk-50-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Save your plot using `ggsave`
+
+
+* Saving your plot at a fixed size is a good  practice
 --
 
 
 ```r
-#d is the dataset with the populations of the countries
-data_tidy &lt;- d %&gt;%
-  pivot_longer(cols =  `-country`,
-               `names_to` = "Year", # New name
-               #for the columns 2002 and 2007
-               `values_to` = "Population") 
-    #New name for the values
-
-head(data_tidy)
-```
-
-
-```
-## # A tibble: 6 x 3
-##   country Year  Population
-##   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt;
-## 1 Belgium 2002    10311970
-## 2 Belgium 2007    10392226
-## 3 France  2002    59925035
-## 4 France  2007    61083916
-## 5 Germany 2002    82350671
-## 6 Germany 2007    82400996
-```
-
----
-
-Conversely, `pivot_wider` allows us to come back to the first dataset.
-
---
-
-
-```r
-data_tidy %&gt;% pivot_wider(names_from = Year, values_from = Population)
-```
-
-```
-## # A tibble: 6 x 3
-##   country       `2002`   `2007`
-##   &lt;chr&gt;          &lt;dbl&gt;    &lt;dbl&gt;
-## 1 Belgium     10311970 10392226
-## 2 France      59925035 61083916
-## 3 Germany     82350671 82400996
-## 4 Italy       57926999 58147733
-## 5 Spain       40152517 40448191
-## 6 Switzerland  7361757  7554661
+#Many parameters exist to save your plots
+ggsave(filename = "my_path/title_of_the_plot.jpg",
+       plot = my_plot, units = "cm",
+       height = 25, width = 20)
 ```
 
 
 ---
-
-class: center, middle
-
-# .large[Is everything clear ?]
-
-&lt;img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" /&gt;
-
-
----
-class: center, middle
 
 # Exercises
 
---
+
 .large[~ 20 minutes]
 
 --
+  
+.large[*Open "ggplot2_customization" with Rstudio*]
 
-.large[*Answer to the questions of the section "Tidy your data"*]
+
 
 
 ---
 
-# Conclusion
+class: inverse, middle, center
 
-The `tidyverse` provides many tools to work with data. 
+## Concusion
 
---
 
-Many topics have not been presented today:
+---
 
-* manipulate factors using `forcats`
-* manipulate dates using `lubridate`
-* manipulate dates using `stringr`
-* ...
+* This was just an introduction
 
 --
 
-Feel free to consult this book (available for free online at this adress: [https://r4ds.had.co.nz/](https://r4ds.had.co.nz/)):
+* ggplot2 offer *many* possibilities
 
-&lt;!-- .center[![](lesson_figures/r4ds.jpg)] --&gt;
-.center[&lt;img src="lesson_figures/r4ds.jpg" style="width: 20%" /&gt;]
+--
+
+* Here are some wonderful plots by @abichat to give you some tastes 
+
+---
+
+.center[&lt;img src="lesson_figures/abichat1.png" style="width: 80%" /&gt;
+]
+
+--
+
+.center[&lt;img src="lesson_figures/abichat2.png" style="width: 60%" /&gt;
+]
+---
+
+.center[&lt;img src="lesson_figures/abichat3.png" style="width: 80%" /&gt;
+]
+--
+
+.center[&lt;img src="lesson_figures/abichat4.png" style="width: 60%" /&gt;
+]
+
+
+---
+
+## ggplot2 resources online
+
+* [https://cedricscherer.netlify.app/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/](wonderful and complete article about ggplot): my holy bible for ggplot2
+* [https://ggplot2tutor.com/](a bunch of tutorials) on ggplot2, really clear
+* [https://ggplot2-book.org/](the ggplot2 book), recall and explanations
+
+
+---
+
+## References
+
+* [http://www.nathalievialaneix.eu/doc/html/biostat-ggplot2.html#/](a lesson from N. Vialaneix)
+* [https://ggplot2-book.org/](the ggplot2 book)
+* [https://github.com/abichat/tidytuesday](wonderful plots of A. Bichat): go take a look !
+
 
 ---
 
@@ -1307,9 +1350,7 @@ class: center, middle
 
 --
 
-Lesson contents available at: [https://github.com/RemiMahmoud/data_wrangling](https://github.com/RemiMahmoud/data_wrangling)
-
-&lt;!-- ### `tidyr::pivot_longer` and `tidyr::pivot_wider` --&gt;
+Lesson contents available at: [https://github.com/RemiMahmoud/data_wrangling](https://github.com/RemiMahmoud/ggplot2_lesson)
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
