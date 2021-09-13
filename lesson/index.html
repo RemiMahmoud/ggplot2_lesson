@@ -243,10 +243,6 @@ __Base graphics:__
   * is less verbose for simple / canned graphics
   * has methods (plot works for many different ojects)
 
---
-
-
-
 __ggplot2:__
 
   * R graphing package by Hadley Wickham based on the Grammar of Graphics (Wilkinson, 2005)
@@ -760,6 +756,7 @@ p_diamonds
 &lt;img src="index_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
 
 
+
 ---
 
 * One color for each for each color of the diamond, one shape for each cut of the diamond
@@ -809,13 +806,21 @@ p_diamonds + scale_color_continuous(low = "blue", high = "red")
 &lt;img src="index_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
 
 
+
 ---
 
-### Working with aesthetics: scale
-
-&lt;img src="index_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+### Working with aesthetics: modify the shape's legend
 
 
+```r
+p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))+ 
+  geom_point(aes(shape = factor(cyl)),
+             alpha = .3) +
+  scale_shape_discrete(`labels = paste(c(4,5,6,8), "cylinders")`)  `# Modify labels of the legend`
+p 
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -834,7 +839,7 @@ histogram_prices &lt;- ggplot(data_work, aes(x = price)) + # No need for a y as 
 histogram_prices
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-30-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -851,7 +856,7 @@ histogram_prices +
   facet_wrap(cut~. )
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-30-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -863,7 +868,7 @@ histogram_prices +
   facet_wrap(cut~., scales = "free_y" )
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -877,7 +882,7 @@ histogram_prices +
   facet_grid(cut~color,scales = "free_y")
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-33-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -943,7 +948,7 @@ plot_unemployed &lt;- ggplot(data = economics, aes(x  =date, y = unemploy)) +
 plot_unemployed
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-34-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-35-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -956,7 +961,7 @@ plot_unemployed +
   labs(title = "Number of unemployed people (in thousands) in the USA")
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-35-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-36-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -973,7 +978,7 @@ plot_unemployed +
        caption = "Copyright Remi Mahmoud :-)")
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-36-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-37-1.svg" style="display: block; margin: auto;" /&gt;
 ---
 
 * Adding modifying axes titles is also straightforward
@@ -988,7 +993,7 @@ plot_unemployed +
        caption = "Copyright Remi Mahmoud :-)", x = "DATE", y = "Number of unemployed people")
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-37-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-38-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1002,7 +1007,7 @@ p_diamonds+ `labs(colour = "Depth\nof the\ndiamond")`
 ```
 
 
-&lt;img src="index_files/figure-html/unnamed-chunk-39-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-40-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1064,7 +1069,7 @@ plot_population &lt;- ggplot(data = economics, aes(x  =date, y = pop)) +
 plot_population
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-40-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-41-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1085,7 +1090,7 @@ To modify the theme of a plot, simply add it to the ggplot object
 plot_population + theme_minimal()
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-41-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-42-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1095,7 +1100,7 @@ plot_population + theme_minimal()
 plot_population + theme_bw()
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-42-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-43-1.svg" style="display: block; margin: auto;" /&gt;
 ---
 
 
@@ -1103,7 +1108,7 @@ plot_population + theme_bw()
 plot_population + theme_dark()
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-43-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-44-1.svg" style="display: block; margin: auto;" /&gt;
 ---
 
 .small[
@@ -1211,7 +1216,7 @@ p_diamonds +
         title = element_text(face = "italic")) # Modify the face of `ALL` titles
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-47-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-48-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1245,7 +1250,7 @@ p_diamonds +
 --
 
 
-&lt;img src="index_files/figure-html/unnamed-chunk-50-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-51-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 

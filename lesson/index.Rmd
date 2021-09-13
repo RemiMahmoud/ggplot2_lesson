@@ -258,10 +258,6 @@ __Base graphics:__
   * is less verbose for simple / canned graphics
   * has methods (plot works for many different ojects)
 
---
-
-
-
 __ggplot2:__
 
   * R graphing package by Hadley Wickham based on the Grammar of Graphics (Wilkinson, 2005)
@@ -673,11 +669,12 @@ p_diamonds
 ```
 
 
-```{r, fig.height = 3, echo = FALSE}
-p <- ggplot(data = mpg, aes(x =displ,  y= hwy ))
-p + geom_point(aes(shape = factor(cyl)), alpha = .3) +
-  scale_shape_discrete(labels = paste(c(4,5,6,8), "cylinders"))
+```{r, fig.height = 3.5, echo = FALSE, warning=FALSE}
+p_diamonds <- ggplot(data_work, aes(x = carat, y = price)) + 
+  geom_point(aes(col = cut)) #Says to ggplot2, give on color to each modality of cut
+p_diamonds
 ```
+
 
 
 ---
@@ -726,17 +723,24 @@ p_diamonds + scale_color_continuous(low = "blue", high = "red")
 ```
 
 
+
 ---
 
-### Working with aesthetics: scale
+### Working with aesthetics: modify the shape's legend
 
-```{r, fig.height = 4, echo = FALSE, warning=FALSE}
-p_diamonds <- ggplot(data_work, aes(x = carat, y = price)) + 
-  geom_point(aes(shape = cut), alpha = 0.1) #Says to ggplot2, give one shape to each modality of cut
-p_diamonds
+```{r, fig.height = 3, eval = FALSE}
+p <- ggplot(data = mpg, aes(x =displ,  y= hwy ))+ 
+  geom_point(aes(shape = factor(cyl)),
+             alpha = .3) +
+  scale_shape_discrete(`labels = paste(c(4,5,6,8), "cylinders")`)  `# Modify labels of the legend`
+p 
 ```
 
-
+```{r, fig.height = 3, echo = FALSE}
+p <- ggplot(data = mpg, aes(x =displ,  y= hwy ))+ geom_point(aes(shape = factor(cyl)), alpha = .3) +
+  scale_shape_discrete(labels = paste(c(4,5,6,8), "cylinders"))
+p 
+```
 
 ---
 
