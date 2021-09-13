@@ -1093,7 +1093,7 @@ ggsave(filename = "my_path/title_of_the_plot.jpg",
 
 class: inverse, middle, center
 
-## Concusion
+## Conclusion
 
 
 ---
@@ -1131,18 +1131,18 @@ class: inverse, middle, center
 
 ## ggplot2 resources online
 
-* [https://cedricscherer.netlify.app/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/](wonderful and complete article about ggplot): my holy bible for ggplot2
-* [https://ggplot2tutor.com/](a bunch of tutorials) on ggplot2, really clear
-* [https://ggplot2-book.org/](the ggplot2 book), recall and explanations
+* [wonderful and complete article about ggplot](https://cedricscherer.netlify.app/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/): my holy bible for ggplot2
+* [a bunch of tutorials](https://ggplot2tutor.com/) on ggplot2, really clear
+* [the ggplot2 book](https://ggplot2-book.org/), recall and explanations
 
 
 ---
 
 ## References
 
-* [http://www.nathalievialaneix.eu/doc/html/biostat-ggplot2.html#/](a lesson from N. Vialaneix)
-* [https://ggplot2-book.org/](the ggplot2 book)
-* [https://github.com/abichat/tidytuesday](wonderful plots of A. Bichat): go take a look !
+* [a lesson from N. Vialaneix](http://www.nathalievialaneix.eu/doc/html/biostat-ggplot2.html#/)
+* [the ggplot2 book](https://ggplot2-book.org/)
+* [wonderful plots of A. Bichat](https://github.com/abichat/tidytuesday): go take a look !
 
 
 ---
@@ -1161,5 +1161,5 @@ class: center, middle
 
 --
 
-Lesson contents available at: [https://github.com/RemiMahmoud/data_wrangling](https://github.com/RemiMahmoud/ggplot2_lesson)
+Lesson contents available at: [https://github.com/RemiMahmoud/ggplot2_lesson](https://github.com/RemiMahmoud/ggplot2_lesson)
 
