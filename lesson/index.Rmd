@@ -160,7 +160,7 @@ class: inverse, middle, center
 ---
 
 
-class: inverse, middle, center
+class: middle, center
 
 ## DATA-VISUALIZATION IS AN ESSENTIAL STEP
 
@@ -653,7 +653,7 @@ p_diamonds
 
 ---
 
-* One shape for each for each number of cylinders of the cars
+* One color for each cut of the diamond
 
 
 --
@@ -664,7 +664,7 @@ p_diamonds
 
 ```{r, fig.height = 2, eval = FALSE}
 p_diamonds <- ggplot(data_work, aes(x = carat, y = price)) + 
-  geom_point(aes(`col = cut`)) `#Says to ggplot2, give on color to each modality of cut`
+  geom_point(aes(`col = cut`)) `#Says to ggplot2, give one color to each modality of cut`
 p_diamonds
 ```
 
@@ -689,7 +689,7 @@ p_diamonds
 
 ```{r, fig.height = 2, eval = FALSE}
 p_diamonds <- ggplot(data_work, aes(x = carat, y = price)) + 
-  geom_point(aes(`col = color, shape = cut`)) `#Says to ggplot2, give on shape to each modality of cut, one color to each diamond color`
+  geom_point(aes(`col = color, shape = cut`)) `#Says to ggplot2, give one shape to each modality of cut, one color to each diamond color`
 p_diamonds
 ```
 
@@ -709,36 +709,54 @@ p_diamonds
 ```{r, fig.height = 3, echo = TRUE}
 p_diamonds <- ggplot(data_work, aes(x = carat, y = price)) + 
   geom_point(aes(col = depth),
-             alpha = .1) #Says to ggplot2, give on color based on the value of depth
+             alpha = .1) #Says to ggplot2, give one color based on the value of depth
 #Put transparency on 0.1, regardless of the points' values
 p_diamonds
 ```
 
 ---
 
-### Working with aesthetics: scale
+### Working with scales (color boundaries)
 
 ```{r, fig.height =4}
 p_diamonds + scale_color_continuous(low = "blue", high = "red")
+```
+
+---
+### Working with scales: put a log scale
+
+```{r, fig.height =4}
+p_diamonds + scale_y_log10()
+```
+
+---
+### Working with scales: set the breaks of an axis
+
+
+```{r, fig.height = 4, echo = TRUE}
+p_diamonds +
+  scale_x_continuous(n.breaks = 8) +
+  scale_y_continuous(breaks = c(0,3142, 8238,12334, 16798 )) 
 ```
 
 
 
 ---
 
-### Working with aesthetics: modify the shape's legend
+### Working with scales: modify the shape's legend
 
 ```{r, fig.height = 3, eval = FALSE}
 p <- ggplot(data = mpg, aes(x =displ,  y= hwy ))+ 
   geom_point(aes(shape = factor(cyl)),
              alpha = .3) +
-  scale_shape_discrete(`labels = paste(c(4,5,6,8), "cylinders")`)  `# Modify labels of the legend`
+  scale_shape_discrete(`labels = paste(c(4,5,6,8), "cylinders")`,
+                       name = "Number of\ncylinders")  `# Modify labels of the legend`
 p 
 ```
 
 ```{r, fig.height = 3, echo = FALSE}
-p <- ggplot(data = mpg, aes(x =displ,  y= hwy ))+ geom_point(aes(shape = factor(cyl)), alpha = .3) +
-  scale_shape_discrete(labels = paste(c(4,5,6,8), "cylinders"))
+p <- ggplot(data = mpg, aes(x =displ,  y= hwy ))+ geom_point(aes(shape = factor(cyl)), alpha = .4) +
+  scale_shape_discrete(labels = paste(c(4,5,6,8), "cylinders"), name = "Number of\ncylinders")
 p 
 ```
 
@@ -777,10 +795,16 @@ histogram_prices +
 
 We can use the `scales` argument, to let scales vary freely across plots
 
-```{r, fig.height = 4}
+```{r, fig.height = 4, eval = FALSE}
 
 histogram_prices + 
-  facet_wrap(cut~., scales = "free_y" )
+  facet_wrap(cut~., `scales = "free_y"` ) `# Arg "free_x" for free x axis, "free" for both axis free to vary` axis
+```
+
+```{r, fig.height = 4, eval = TRUE, echo =FALSE}
+
+histogram_prices + 
+  facet_wrap(cut~., scales = "free_y") # Arg "free_x" for free x axis, "free" for both axis free to vary`axis
 ```
 
 
@@ -821,6 +845,8 @@ str(economics)
 
 ---
 
+* Here is a plot, without any title (btw. note the `span` argument to make the fit closer to the points)
+
 ```{r, fig.height = 3}
 plot_unemployed <- ggplot(data = economics, aes(x  =date, y = unemploy)) + 
   geom_line() + 
@@ -848,7 +874,7 @@ plot_unemployed +
 
 --
 
-```{r, fig.height = 3}
+```{r, fig.height = 4}
 plot_unemployed + 
   labs(title = "Number of unemployed people (in thousands) in the USA", 
        subtitle = "From 1967 to 2015", 
@@ -865,7 +891,8 @@ plot_unemployed +
 plot_unemployed + 
   labs(title = "Number of unemployed people (in thousands) in the USA",
        subtitle = "From 1967 to 2015",
-       caption = "Copyright Remi Mahmoud :-)", x = "DATE", y = "Number of unemployed people")
+       caption = "Copyright Remi Mahmoud :-)", 
+       x = "DATE", y = "Number of unemployed people")
 
 ```
 
@@ -883,6 +910,23 @@ p_diamonds+ `labs(colour = "Depth\nof the\ndiamond")`
 ```{r, fig.height = 4,echo = FALSE}
 p_diamonds + labs(colour = "Depth\nof the\ndiamond")
 ```
+
+
+---
+
+class: center, middle
+
+# .large[Is everything clear ?]
+
+<img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" />
+
+
+---
+
+class: center, middle
+
+
+<img src="lesson_figures/break.jpg" style="width: 80%" />
 
 ---
 
@@ -951,13 +995,15 @@ Non-data elements, like background property, legend appearance, axis labels are 
 
 --
 
-We will se how to specify our own themes, but there are already some predefined themes (`theme_bw()`, `theme_minimal`) .
+We will se how to specify our own themes, but there are already some predefined themes (`theme_bw()`, `theme_minimal()`) .
 
 --
 
-To modify the theme of a plot, simply add it to the ggplot object
+To modify the theme of a plot, simply add the desired theme to the ggplot object
 
 ---
+
+### Predefined themes: theme_minimal()
 
 ```{r, fig.height = 4}
 
@@ -966,11 +1012,13 @@ plot_population + theme_minimal()
 
 ---
 
+### Predefined themes: theme_bw()
 
 ```{r, fig.height = 4}
 plot_population + theme_bw()
 ```
 ---
+### Predefined themes: theme_dark()
 
 ```{r, fig.height = 4}
 plot_population + theme_dark()
@@ -1003,15 +1051,15 @@ attributes_theme[grepl(attributes_theme, pattern = "text|title")]
 * `element_text()` can set the font, the color, the angle of the text setted (see `?element_text()` for a complete list)
 
 ---
+
 ### Modify texts elements
 
 ```{r, eval = FALSE}
-p_diamonds +
+p_diamonds +  labs(title = "A nice title") +
   theme_bw() +
-  labs(title = "A nice title") +
   theme(axis.title.x = element_text(color = "red"), `# Modify title of the x axis`
           axis.title.y = element_text(color = "orange"), `# Modify title of the y axis`
-        axis.text = element_text(angle = 180), # Modify the angle of `all` the axis texts
+        axis.text = element_text(angle = 180), # Modify the angle of `ALL` the axis texts
         legend.title = element_text(size = 14 ),`# Modify the size of the legend title`
         plot.title = element_text(face = "bold"), `# Modify the face of the plot title`
         title = element_text(face = "italic")) # Modify the face of `ALL` titles
@@ -1042,9 +1090,8 @@ attributes_theme[grepl(attributes_theme, pattern = "background")]
 
 
 ```{r, eval = FALSE}
-p_diamonds +
+p_diamonds +  labs(title = "A nice title") +
   theme_bw() +
-  labs(title = "A nice title") +
   theme(legend.background = element_rect(color = "black", linetype = "dashed"), `#modify the rectangle across the legend`
         plot.background = element_rect(fill = "lightblue", colour = "purple"), `#guess what ?`
         panel.background = element_rect(fill = "pink")) `#guess what ?`
@@ -1077,6 +1124,15 @@ ggsave(filename = "my_path/title_of_the_plot.jpg",
        height = 25, width = 20)
 
 ```
+
+
+---
+
+class: center, middle
+
+# .large[Is everything clear ?]
+
+<img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" />
 
 
 ---

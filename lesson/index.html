@@ -148,7 +148,7 @@ class: inverse, middle, center
 ---
 
 
-class: inverse, middle, center
+class: middle, center
 
 ## DATA-VISUALIZATION IS AN ESSENTIAL STEP
 
@@ -736,7 +736,7 @@ p_diamonds
 
 ---
 
-* One shape for each for each number of cylinders of the cars
+* One color for each cut of the diamond
 
 
 --
@@ -748,7 +748,7 @@ p_diamonds
 
 ```r
 p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
-  geom_point(aes(`col = cut`)) `#Says to ggplot2, give on color to each modality of cut`
+  geom_point(aes(`col = cut`)) `#Says to ggplot2, give one color to each modality of cut`
 p_diamonds
 ```
 
@@ -770,7 +770,7 @@ p_diamonds
 
 ```r
 p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
-  geom_point(aes(`col = color, shape = cut`)) `#Says to ggplot2, give on shape to each modality of cut, one color to each diamond color`
+  geom_point(aes(`col = color, shape = cut`)) `#Says to ggplot2, give one shape to each modality of cut, one color to each diamond color`
 p_diamonds
 ```
 
@@ -787,7 +787,7 @@ p_diamonds
 ```r
 p_diamonds &lt;- ggplot(data_work, aes(x = carat, y = price)) + 
   geom_point(aes(col = depth),
-             alpha = .1) #Says to ggplot2, give on color based on the value of depth
+             alpha = .1) #Says to ggplot2, give one color based on the value of depth
 #Put transparency on 0.1, regardless of the points' values
 p_diamonds
 ```
@@ -796,7 +796,7 @@ p_diamonds
 
 ---
 
-### Working with aesthetics: scale
+### Working with scales (color boundaries)
 
 
 ```r
@@ -805,22 +805,46 @@ p_diamonds + scale_color_continuous(low = "blue", high = "red")
 
 &lt;img src="index_files/figure-html/unnamed-chunk-27-1.svg" style="display: block; margin: auto;" /&gt;
 
+---
+### Working with scales: put a log scale
+
+
+```r
+p_diamonds + scale_y_log10()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-28-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+### Working with scales: set the breaks of an axis
+
+
+
+```r
+p_diamonds +
+  scale_x_continuous(n.breaks = 8) +
+  scale_y_continuous(breaks = c(0,3142, 8238,12334, 16798 )) 
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
+
 
 
 ---
 
-### Working with aesthetics: modify the shape's legend
+### Working with scales: modify the shape's legend
 
 
 ```r
 p &lt;- ggplot(data = mpg, aes(x =displ,  y= hwy ))+ 
   geom_point(aes(shape = factor(cyl)),
              alpha = .3) +
-  scale_shape_discrete(`labels = paste(c(4,5,6,8), "cylinders")`)  `# Modify labels of the legend`
+  scale_shape_discrete(`labels = paste(c(4,5,6,8), "cylinders")`,
+                       name = "Number of\ncylinders")  `# Modify labels of the legend`
 p 
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-29-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -839,7 +863,7 @@ histogram_prices &lt;- ggplot(data_work, aes(x = price)) + # No need for a y as 
 histogram_prices
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-30-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -856,7 +880,7 @@ histogram_prices +
   facet_wrap(cut~. )
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-31-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-33-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -865,10 +889,10 @@ We can use the `scales` argument, to let scales vary freely across plots
 
 ```r
 histogram_prices + 
-  facet_wrap(cut~., scales = "free_y" )
+  facet_wrap(cut~., `scales = "free_y"` ) `# Arg "free_x" for free x axis, "free" for both axis free to vary` axis
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-32-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-35-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -882,7 +906,7 @@ histogram_prices +
   facet_grid(cut~color,scales = "free_y")
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-33-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-36-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -938,6 +962,8 @@ str(economics)
 
 ---
 
+* Here is a plot, without any title (btw. note the `span` argument to make the fit closer to the points)
+
 
 ```r
 plot_unemployed &lt;- ggplot(data = economics, aes(x  =date, y = unemploy)) + 
@@ -948,7 +974,7 @@ plot_unemployed &lt;- ggplot(data = economics, aes(x  =date, y = unemploy)) +
 plot_unemployed
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-35-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-38-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -961,7 +987,7 @@ plot_unemployed +
   labs(title = "Number of unemployed people (in thousands) in the USA")
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-36-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-39-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -978,7 +1004,7 @@ plot_unemployed +
        caption = "Copyright Remi Mahmoud :-)")
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-37-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-40-1.svg" style="display: block; margin: auto;" /&gt;
 ---
 
 * Adding modifying axes titles is also straightforward
@@ -990,10 +1016,11 @@ plot_unemployed +
 plot_unemployed + 
   labs(title = "Number of unemployed people (in thousands) in the USA",
        subtitle = "From 1967 to 2015",
-       caption = "Copyright Remi Mahmoud :-)", x = "DATE", y = "Number of unemployed people")
+       caption = "Copyright Remi Mahmoud :-)", 
+       x = "DATE", y = "Number of unemployed people")
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-38-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-41-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1007,7 +1034,24 @@ p_diamonds+ `labs(colour = "Depth\nof the\ndiamond")`
 ```
 
 
-&lt;img src="index_files/figure-html/unnamed-chunk-40-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-43-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+class: center, middle
+
+# .large[Is everything clear ?]
+
+&lt;img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" /&gt;
+
+
+---
+
+class: center, middle
+
+
+&lt;img src="lesson_figures/break.jpg" style="width: 80%" /&gt;
 
 ---
 
@@ -1069,7 +1113,7 @@ plot_population &lt;- ggplot(data = economics, aes(x  =date, y = pop)) +
 plot_population
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-41-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-44-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1077,38 +1121,42 @@ Non-data elements, like background property, legend appearance, axis labels are 
 
 --
 
-We will se how to specify our own themes, but there are already some predefined themes (`theme_bw()`, `theme_minimal`) .
+We will se how to specify our own themes, but there are already some predefined themes (`theme_bw()`, `theme_minimal()`) .
 
 --
 
-To modify the theme of a plot, simply add it to the ggplot object
+To modify the theme of a plot, simply add the desired theme to the ggplot object
 
 ---
+
+### Predefined themes: theme_minimal()
 
 
 ```r
 plot_population + theme_minimal()
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-42-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-45-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
+### Predefined themes: theme_bw()
 
 
 ```r
 plot_population + theme_bw()
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-43-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-46-1.svg" style="display: block; margin: auto;" /&gt;
 ---
+### Predefined themes: theme_dark()
 
 
 ```r
 plot_population + theme_dark()
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-44-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-47-1.svg" style="display: block; margin: auto;" /&gt;
 ---
 
 .small[
@@ -1201,22 +1249,22 @@ attributes_theme[grepl(attributes_theme, pattern = "text|title")]
 * `element_text()` can set the font, the color, the angle of the text setted (see `?element_text()` for a complete list)
 
 ---
+
 ### Modify texts elements
 
 
 ```r
-p_diamonds +
+p_diamonds +  labs(title = "A nice title") +
   theme_bw() +
-  labs(title = "A nice title") +
   theme(axis.title.x = element_text(color = "red"), `# Modify title of the x axis`
           axis.title.y = element_text(color = "orange"), `# Modify title of the y axis`
-        axis.text = element_text(angle = 180), # Modify the angle of `all` the axis texts
+        axis.text = element_text(angle = 180), # Modify the angle of `ALL` the axis texts
         legend.title = element_text(size = 14 ),`# Modify the size of the legend title`
         plot.title = element_text(face = "bold"), `# Modify the face of the plot title`
         title = element_text(face = "italic")) # Modify the face of `ALL` titles
 ```
 
-&lt;img src="index_files/figure-html/unnamed-chunk-48-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-51-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1239,9 +1287,8 @@ attributes_theme[grepl(attributes_theme, pattern = "background")]
 
 
 ```r
-p_diamonds +
+p_diamonds +  labs(title = "A nice title") +
   theme_bw() +
-  labs(title = "A nice title") +
   theme(legend.background = element_rect(color = "black", linetype = "dashed"), `#modify the rectangle across the legend`
         plot.background = element_rect(fill = "lightblue", colour = "purple"), `#guess what ?`
         panel.background = element_rect(fill = "pink")) `#guess what ?`
@@ -1250,7 +1297,7 @@ p_diamonds +
 --
 
 
-&lt;img src="index_files/figure-html/unnamed-chunk-51-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-54-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1267,6 +1314,15 @@ ggsave(filename = "my_path/title_of_the_plot.jpg",
        plot = my_plot, units = "cm",
        height = 25, width = 20)
 ```
+
+
+---
+
+class: center, middle
+
+# .large[Is everything clear ?]
+
+&lt;img src="lesson_figures/interrogation_mark.jpg" style="width: 50%" /&gt;
 
 
 ---
