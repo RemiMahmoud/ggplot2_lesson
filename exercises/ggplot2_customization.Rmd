@@ -1,0 +1,127 @@
+---
+title: "ggplot2_customization"
+date: "17/09/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercise 1: Basic customization
+
+1. Load the `iris` dataset and plot (scatterplot) the Petal.Width against the Petal.Length of the flowers. Add a linear smoothing. Each species should have its own linear smoothing .
+
+```{r}
+```
+
+2. Add the `theme_bw` (bw stands for black & white) to your plot.
+
+```{r}
+
+```
+
+3. Add the `theme_dark` after the `theme_bw`. What happens ? 
+
+```{r}
+
+```
+
+
+
+4. Many themes exist. List them by running `ls("package:ggplot2")[grepl(ls("package:ggplot2"),pattern = "theme")]`.
+
+```{r}
+ls("package:ggplot2")[grepl(ls("package:ggplot2"),pattern = "theme")]
+
+```
+
+5. Instead of specifying the theme in each plot, you can set the active theme by using the `theme_set` function. Set `theme_bw` as the default theme for each plot.
+
+```{r}
+
+
+```
+
+6. Specify the colors of each species using the `scale_colour_manual` function. Pick colors of your choice (all R colors are available using the `colours()` function). Look at the help page of the function to get the syntax. 
+
+```{r}
+
+
+```
+
+7. Add a title to your plot. Put it in bold
+
+```{r}
+
+```
+
+
+8. Put the axis titles in italic
+
+
+```{r}
+
+```
+
+9. Change the color and the type of the background grid (`panel.grid`, which is modified using `element_line`)
+
+
+```{r}
+
+```
+
+
+10. Put the legend at the bottom of the plot.
+```{r}
+```
+
+11. Play with other parameters of the plot. Change the margin of the legend (`legend.margin` + `margin` function).
+
+```{r}
+
+
+```
+
+# Exercise 2: other things to look at
+
+1. Load the `mtcars` dataset.
+
+```{r}
+data("mtcars")
+
+```
+
+
+2. Plot values of `wt` versus `mpg`. Add a `geom_text_repel` (or `geom_label_repel`) layer (from the package `ggrepel`), that will show the name of each car on each point. Each number of cylinders should have a different color (labels and points)
+
+```{r}
+
+```
+
+
+3. Add a `facet_wrap` layer to separate these plots by cylinder.
+
+```{r}
+
+```
+
+4. Change the size of the axis' ticks (see `axis.ticks.length` argument of `theme` combined with the `unit` function). Play with the `strip.background` argument of `theme`. What does it change ? 
+
+```{r}
+```
+
+
+5. Do another plot (of your choice) with the `mtcars` dataset. Combine the two plots using the `plot_grid` function (package `cowplot`).
+
+```{r}
+```
+
+6. Save the plot using the `ggsave` function. Explore the arguments
+
+```{r, eval= FALSE}
+
+
+# ggsave("exercise/two_plots.png", height = 10, width = 12, unit = "cm")
+```
+

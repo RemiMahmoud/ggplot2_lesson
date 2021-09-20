@@ -1,0 +1,177 @@
+---
+title: "ggplot2_basics"
+date: "17/09/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercise 1: First steps with ggplot
+
+## Setup
+
+### Load ggplot2
+
+
+1. Load `ggplot2` using the `library` function
+
+```{r}
+```
+
+
+### Read data
+
+2. Read the data file called "data_ex1_1.csv" in the "data" folder and store it in an object (name it as you like).
+
+```{r}
+
+```
+
+
+### Explore data
+
+3. Look at the data structure using `str` function. How many columns are there ? What are their type ?
+```{r}
+
+
+
+```
+
+4. Compute the mean for each modality of the `group` column. 
+
+```{r}
+```
+
+## Visualize the data using ggplot2
+
+We want to have a look at the distribution of the data (column "value").
+
+5. Run the following lines to create a ggplot object, store it in an object called `my_plot`.
+
+```{r}
+my_plot <- ggplot(data = data_ex1_1, aes(x = 0, y = value)) # We don't need to put " as ggplot2 recpgnizes the columns' names
+
+```
+
+Take a look at the `my_plot` object by running `my_plot`.
+
+6. Add a layer `geom_boxplot` to the `my_plot` object. Name this new plot `my_boxplot`, and take a look at it. Do you see anything particular ?
+
+```{r}
+
+```
+
+
+
+7. Add a layer `geom_point` to the `my_boxplot` object.
+
+Do you see anything ? 
+```{r}
+
+my_boxplot+
+  geom_point() 
+```
+
+Except if you're a witcher, you should not be able do distinguish anything :-).
+
+
+
+8. Let's guide you to make things clearer. 
+In the `geom_point` function, add these arguments:
+
+* `alpha = 0.3`
+* `position = position_jitter(width = .1, height = 0)`
+
+What is the role of each argument ?
+
+```{r}
+```
+
+Anyway, things are clearer, but one aspect of the dataset may pass under the radar.
+
+9. Suppose we would like to have a boxplot for each modality of the `group` column. What should we specify instead of `x = 0` in the `aes` ? Redo the steps 5 to 8, with one boxplot by group. What can you conclude about the distribution of `value` within the groups ? 
+
+
+```{r}
+
+```
+
+10. Instead of `geom_boxplot`, use the `geom_violin` function
+
+```{r}
+
+
+```
+
+What can you conclude about the importance of visualization ?
+
+
+
+# Exercise 2: other visualizations
+
+1. Load the `msleep` dataset (`data("msleep")`), take a look at `?msleep` to know more about the columns
+
+```{r}
+```
+
+
+2. Look at a histogram of the sleep_total column. Add a vertical line (see `geom_vline` at the mean of the `sleep_total` column) Roughly speaking, how long do the mammals sleep ? Do the values vary a lot ? 
+
+```{r}
+
+```
+
+3. Use a `geom_bar` to look at the number of mammals of each `vore` type. How many mammals have their `vore` type not specified ?
+
+```{r}
+
+
+```
+
+4. Use `geom_smooth()` and `geom_point()` layers to look at the relationship between `sleep_total` and `awake` columns. What do you see ? How can you explain this wonderful relationship :o
+
+```{r}
+```
+
+
+
+......
+
+
+
+
+Congratulations, you've won a Nobel prize. When an animal does not sleep, he is awake :-).
+
+
+5.A bit more serious now, any relation ship between the body weight and the brain weight ?
+
+
+```{r}
+```
+
+6. What make things difficult to see ? Which transformation could you apply to look at the relationship between these two variables ? Apply that transformation (*Hint:* no need to create new columns; simply put the function around the `bodywt` and `brainwt` inside the `aes` argument).
+
+```{r}
+
+
+```
+
+7. Add horizontal and vertical lines (`geom_hline` and `geom_vline`), to make things easier to read (lines should cross at the (0,0) point)
+
+```{r}
+
+
+```
+
+8. Could you roughly derive a (mathematical) relationship between the body weight and the brain weight ? 
+
+
+9. Confirm your thoughts using the `lm` function
+
+```{r}
+
+
+```
+

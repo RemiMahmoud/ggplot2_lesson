@@ -1,0 +1,93 @@
+---
+title: "ggplot2_aesthetics"
+date: "17/09/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+
+
+# Exercise 1: A clother look to the `msleep` dataset
+
+1. Load the `msleep` dataset (`data("msleep")`)
+
+```{r}
+```
+
+
+2. Look back at the relationship between the body weight and the brain weight ?
+
+
+```{r}
+
+```
+
+3. What make things difficult to see ? Apply a log transformation to the axes by adding `scale_x_log10()` and `scale_y_log10()` layers to the plot.
+
+```{r}
+
+
+```
+
+4. Run the `colours()` function. Pick a color of your choice and plot the points in that colour. Should you specify the color *inside* or *outside* ` aes` ? 
+
+```{r}
+
+
+```
+
+5. Use the `size` argument of `geom_point()` to have points bigger when the mammals are longer `awake`. Where should you specify the `size` argument (*inside* or *outside* `aes`?) ?
+
+Put the transparency (`alpha` argument at 0.4 to make things clearer).
+```{r}
+
+```
+
+6. Use the `shape` argument to get one shape for each modality of `vore` column.
+
+```{r}
+
+
+```
+
+7. Add a title, a subtitle and change the titles of the labs. Add a caption.
+ 
+```{r}
+
+```
+
+
+# Exercise 2: Values between groups.
+
+1. Using `geom_density`, plot the density of the `sleep_total` column. 
+
+```{r}
+
+
+```
+
+2. Look at the density for each modality of the `vore` column
+
+i) by using the `facet_wrap` function (see lesson)
+```{r}
+```
+
+ii) by telling to `ggplot` to fill densities by one color for each value of `vore` (`fill` argument; *Hint*: put alpha at 0.2 to make things clearer)
+```{r}
+```
+
+iii) By using `geom_violin` to look at these densities in an other way. Superpose the points. 
+
+```{r}
+
+```
+
+3. Which of the three methods seems the better to look at the differences ?
+
+
+
