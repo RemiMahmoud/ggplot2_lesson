@@ -1,0 +1,138 @@
+---
+title: "ggplot2_aesthetics"
+date: "17/09/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+
+
+# Exercise 1: A clother look to the `msleep` dataset
+
+1. Load the `msleep` dataset (`data("msleep")`)
+
+```{r}
+library(ggplot2)
+data("msleep")
+```
+
+
+2. Look back at the relationship between the body weight and the brain weight ?
+
+
+```{r}
+
+ggplot(data =msleep, aes(y = bodywt, x=  brainwt)) +
+  geom_point()
+
+```
+
+3. What make things difficult to see ? Apply a log transformation to the axes by adding `scale_x_log10()` and `scale_y_log10()` layers to the plot.
+
+```{r}
+
+(plot_bodywt_log <- ggplot(data =msleep, aes(y = bodywt, x=  brainwt)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10())
+
+
+```
+
+4. Run the `colours()` function. Pick a color of your choice and plot the points in that colour. Should you specify the color *inside* or *outside* ` aes` ? 
+
+```{r}
+(plot_bodywt_log <- ggplot(data =msleep, aes(y = bodywt, x=  brainwt)) +
+  geom_point(color  = "tan3") +
+  scale_x_log10() +
+  scale_y_log10())
+
+
+(plot_bodywt_log <- ggplot(data =msleep, aes(y = bodywt, x=  brainwt), col = "tan3") +
+    geom_smooth(method = "lm",inherit.aes = TRUE) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10())
+
+```
+
+5. Use the `size` argument of `geom_point()` to have points bigger when the mammals are longer `awake`. Where should you specify the `size` argument (*inside* or *outside* `aes`?) ?
+
+Put the transparency (`alpha` argument at 0.4 to make things clearer).
+```{r}
+(plot_bodywt_log <- ggplot(data =msleep, aes(y = bodywt, x=  brainwt)) +
+  geom_point(color  = "tan3", aes(size = awake), alpha = .2) +
+  scale_x_log10() +
+  scale_y_log10())
+
+
+```
+
+6. Use the `shape` argument to get one shape for each modality of `vore` column.
+
+```{r}
+
+(plot_bodywt_log <- ggplot(data =msleep, aes(y = bodywt, x=  brainwt)) +
+  geom_point(col = "blue", aes(size = awake, shape = vore), alpha = .4) +
+  scale_x_log10() +
+  scale_y_log10())
+
+```
+
+7. Add a title, a subtitle and change the titles of the labs. Add a caption.
+ 
+```{r}
+
+(plot_bodywt_log <- ggplot(data =msleep, aes(y = bodywt, x=  brainwt)) +
+  geom_point(col = "blue", aes(size = awake, shape = vore), alpha = .4) +
+  scale_x_log10() +
+  scale_y_log10()+
+   labs(x = "coucou", y = "cozejk", title = "youoyoy", caption = "I like to eat"))
+
+```
+
+
+# Exercise 2: Values between groups.
+
+1. Using `geom_density`, plot the density of the `sleep_total` column. 
+
+```{r}
+
+ggplot(data =msleep, aes(x = sleep_total)) +
+  geom_density(fill = "red", alpha =.2)
+
+```
+
+2. Look at the density for each modality of the `vore` column
+
+i) by using the `facet_wrap` function (see lesson)
+```{r}
+
+ggplot(data =msleep, aes(x = sleep_total)) +
+  geom_density(fill = "red", alpha =.2) +
+  facet_wrap(vore~., scales= "free_y" )
+```
+
+ii) by telling to `ggplot` to fill densities by one color for each value of `vore` (`fill` argument; *Hint*: put alpha at 0.2 to make things clearer)
+```{r}
+
+ggplot(data =msleep, aes(x = sleep_total, fill = vore)) +
+  geom_density( alpha =.2) 
+```
+
+iii) By using `geom_violin` to look at these densities in an other way. Superpose the points. 
+
+```{r}
+ggplot(data =msleep, aes(x = vore, y = sleep_total, fill =  vore)) +
+  geom_violin( alpha =.2) +
+  geom_point(alpha = .2, position = position_jitter(width = 0.05, height = 0))
+
+```
+
+3. Which of the three methods seems the better to look at the differences ?
+

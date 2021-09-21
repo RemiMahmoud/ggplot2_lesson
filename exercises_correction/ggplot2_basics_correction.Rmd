@@ -1,5 +1,6 @@
 ---
 title: "ggplot2_basics"
+author: "Rémi Mahmoud"
 date: "17/09/2021"
 output: html_document
 ---
@@ -7,8 +8,6 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-# Exercise 1: First steps with ggplot
 
 ## Setup
 
@@ -18,8 +17,6 @@ knitr::opts_chunk$set(echo = TRUE)
 1. Load `ggplot2` using the `library` function
 
 ```{r}
-
-
 library(ggplot2)
 ```
 
@@ -29,6 +26,11 @@ library(ggplot2)
 2. Read the data file called "data_ex1_1.csv" in the "data" folder and store it in an object (name it as you like).
 
 ```{r}
+
+
+# data_ex1_1 <- tibble(value =  c(rnorm(200, mean = 2, sd = sqrt(0.5)), rnorm(100, 0,sqrt(0.5)), rnorm(100,4,sqrt(0.5))), group = rep(c("A", "B"), each = 200))
+
+# readr::write_csv(data_ex1_1, "data/data_ex1_1.csv")
 data_ex1_1 <- read.csv("data/data_ex1_1.csv")
 ```
 
@@ -38,6 +40,7 @@ data_ex1_1 <- read.csv("data/data_ex1_1.csv")
 3. Look at the data structure using `str` function. How many columns are there ? What are their type ?
 ```{r}
 
+str(data_ex1_1)
 
 
 ```
@@ -45,13 +48,9 @@ data_ex1_1 <- read.csv("data/data_ex1_1.csv")
 4. Compute the mean for each modality of the `group` column. 
 
 ```{r}
-index_row_A <- which(ex1$group == "A")
-index_row_B <- which(ex1$group == "B")
 
-mean(ex1[index_row_A, "value"])
-mean(ex1[index_row_B, "value"])
-
-
+mean(data_ex1_1[which(data_ex1_1$group == "A"),1] )
+mean(data_ex1_1[which(data_ex1_1$group == "B"),1] )
 ```
 
 ## Visualize the data using ggplot2
@@ -60,10 +59,11 @@ We want to have a look at the distribution of the data (column "value").
 
 5. Run the following lines to create a ggplot object, store it in an object called `my_plot`.
 
+
+
 ```{r}
 my_plot <- ggplot(data = data_ex1_1, aes(x = 0, y = value)) # We don't need to put " as ggplot2 recpgnizes the columns' names
 
-my_plot
 ```
 
 Take a look at the `my_plot` object by running `my_plot`.
@@ -71,6 +71,11 @@ Take a look at the `my_plot` object by running `my_plot`.
 6. Add a layer `geom_boxplot` to the `my_plot` object. Name this new plot `my_boxplot`, and take a look at it. Do you see anything particular ?
 
 ```{r}
+
+my_boxplot <- my_plot +
+  geom_boxplot()
+
+my_boxplot
 
 ```
 
@@ -87,8 +92,6 @@ my_boxplot+
 
 Except if you're a witcher, you should not be able do distinguish anything :-).
 
-
-
 8. Let's guide you to make things clearer. 
 In the `geom_point` function, add these arguments:
 
@@ -98,6 +101,9 @@ In the `geom_point` function, add these arguments:
 What is the role of each argument ?
 
 ```{r}
+
+my_boxplot+
+  geom_point(alpha = .3, position = position_jitter(width =.1, height = 0)) 
 ```
 
 Anyway, things are clearer, but one aspect of the dataset may pass under the radar.
@@ -107,15 +113,21 @@ Anyway, things are clearer, but one aspect of the dataset may pass under the rad
 
 ```{r}
 
+my_plot2 <- ggplot(data = data_ex1_1, aes(x =group, y= value)) +
+  geom_boxplot()+
+  geom_point(alpha = .3, position = position_jitter(width =.1, height = 0)) 
+my_plot2
 
-ggplot(data = data_ex1_1, aes(x = group, y=  value)) +
-  geom_point(position = position_jitter(width = .1), alpha = .3) 
 ```
 
 10. Instead of `geom_boxplot`, use the `geom_violin` function
 
 ```{r}
 
+my_plot2 <- ggplot(data = data_ex1_1, aes(x =group, y= value)) +
+  geom_violin()+
+  geom_point(alpha = .3, position = position_jitter(width =.1, height = 0)) 
+my_plot2
 
 ```
 
@@ -128,25 +140,39 @@ What can you conclude about the importance of visualization ?
 1. Load the `msleep` dataset (`data("msleep")`), take a look at `?msleep` to know more about the columns
 
 ```{r}
+data("msleep")
+?msleep
 ```
 
 
 2. Look at a histogram of the sleep_total column. Add a vertical line (see `geom_vline` at the mean of the `sleep_total` column) Roughly speaking, how long do the mammals sleep ? Do the values vary a lot ? 
 
 ```{r}
+ggplot(data = msleep, aes(x = sleep_total)) +
+  geom_histogram(alpha =.4, fill = "blue") +
+  geom_vline(xintercept = mean(msleep$sleep_total)) 
+
+ggplot(data = msleep, aes(x = sleep_total)) +
+  geom_density(alpha =.4, fill = "blue") +
+  geom_vline(xintercept = mean(msleep$sleep_total)) 
 
 ```
 
-3. Use a `geom_bar` to look at the number of mammals of each `vore` type. How many mammals have their `vore` type not specified ?
+3. Use a `geom_bar` to look at the number of mammals of each `vore` type 
 
 ```{r}
 
+ggplot(data=  msleep, aes(x = vore)) +
+  geom_bar()
 
 ```
 
-4. Use `geom_smooth()` and `geom_point()` layers to look at the relationship between `sleep_total` and `awake` columns. What do you see ? How can you explain this wonderful relationship :o
+4. Use `geom_smooth` and `geom_point()` layers to look at the relationship between `sleep_total` and `awake` columns. What do you see ? How can you explain this wonderful relationship :o
 
 ```{r}
+ggplot(data =msleep, aes(x = sleep_total, awake)) +
+  geom_point() +
+  geom_smooth(method = "lm")
 ```
 
 
@@ -163,12 +189,21 @@ Congratulations, you've won a Nobel prize. When an animal does not sleep, he is 
 
 
 ```{r}
+msleep %>% 
+ggplot(data =., aes(x = brainwt, bodywt)) +
+  geom_point() +
+  geom_smooth() 
 ```
 
-6. What make things difficult to see ? Which transformation could you apply to look at the relationship between these two variables ? Apply that transformation (*Hint:* no need to create new columns; simply put the function around the `bodywt` and `brainwt` inside the `aes` argument).
+6. What make things difficult to see ? Which transformation could you apply to look at the relationship between these two variables ? Apply it (no need to create new columns; simply put the function around the `bodywt` and `brainwt` inside the `aes` argument).
 
 ```{r}
 
+
+msleep %>% 
+ggplot(data =., aes(x = log(brainwt), log(bodywt))) +
+  geom_point() +
+  geom_smooth(method = "lm") 
 
 ```
 
@@ -177,15 +212,26 @@ Congratulations, you've won a Nobel prize. When an animal does not sleep, he is 
 ```{r}
 
 
+msleep %>% 
+ggplot(data =., aes(x = log(brainwt), log(bodywt))) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = 0)
+
 ```
 
 8. Could you roughly derive a (mathematical) relationship between the body weight and the brain weight ? 
+
+$\log(y) = 5 + 1.3 \times \log(x)$
+$y = e^5 \times x^1.3$ 
 
 
 9. Confirm your thoughts using the `lm` function
 
 ```{r}
 
+lm(log(bodywt) ~log(brainwt), data =msleep)
 
 ```
 
